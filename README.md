@@ -1,21 +1,102 @@
----
-title: Basics
-toc: false
-order: 1
----
+# Trainings Registry
 
-# Basic Example
+A modern React application with Server-Side Rendering (SSR) built with Vite and React Router DOM.
 
-This example demonstrates some of the basic features of React Router, including:
+## Features
 
-- Layouts and nested `<Route>`s
-- Index `<Route>`s
-- Catch-all `<Route>`s
-- Using `<Outlet>` as a placeholder for child routes
-- Using `<Link>`s for navigation
+-   ⚡️ **Vite** - Lightning fast build tool
+-   ⚛️ **React 18** - Latest React with concurrent features
+-   🧭 **React Router DOM** - Client-side routing with SSR support
+-   🎯 **TypeScript** - Full type safety
+-   🎨 **Modern CSS** - Clean and responsive design
+-   🚀 **SSR Ready** - Server-side rendering for better SEO and performance
 
-## Preview
+## Getting Started
 
-Open this example on [StackBlitz](https://stackblitz.com):
+### Prerequisites
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router/tree/main/examples/basic?file=src/App.tsx)
+-   Node.js 16+
+-   npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd trainings-registry
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+### Development
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:3000`
+
+### Building for Production
+
+1. Build the application:
+
+```bash
+npm run build
+```
+
+2. Start the production server:
+
+```bash
+npm run serve
+```
+
+## Scripts
+
+-   `npm run dev` - Start development server
+-   `npm run build` - Build for production (client + server)
+-   `npm run build:client` - Build client-side code
+-   `npm run build:server` - Build server-side code
+-   `npm run preview` - Preview production build locally
+-   `npm run serve` - Start production server
+
+## Project Structure
+
+```
+src/
+├── pages/           # Page components
+│   ├── Home.tsx
+│   ├── About.tsx
+│   ├── Trainings.tsx
+│   └── Training.tsx
+├── App.tsx          # Main app component
+├── App.css          # Global styles
+├── entry-client.tsx # Client-side entry point
+└── entry-server.tsx # Server-side entry point
+```
+
+## Routes
+
+-   `/` - Home page
+-   `/about` - About page
+-   `/trainings` - Training courses listing
+-   `/trainings/:id` - Individual training course details
+
+## Technologies Used
+
+-   **React** - UI library
+-   **TypeScript** - Type safety
+-   **React Router DOM** - Routing
+-   **Vite** - Build tool and dev server
+-   **Express** - Production server
+-   **CSS3** - Styling
+
+## License
+
+MIT
