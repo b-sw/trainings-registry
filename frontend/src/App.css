@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Typography */
+@layer base {
+    html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    body {
+        font-synthesis: none;
+        font-variant-ligatures: none;
+    }
+
+    html,
+    body {
+        @apply overflow-x-hidden scroll-smooth tracking-wide;
+    }
+
+    #root * {
+        @apply outline-primary-500;
+    }
+}
+
+/* Custom Components */
+@layer components {
+    .sidebar-item {
+        @apply flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition-colors duration-200 cursor-pointer;
+    }
+
+    .sidebar-item.active {
+        @apply bg-primary-50 text-primary-600 font-medium;
+    }
+
+    .sidebar-item:hover {
+        @apply bg-gray-50;
+    }
+
+    .sidebar-item.active:hover {
+        @apply bg-primary-100;
+    }
+}
+
+/* Utility Classes */
+@layer utilities {
+    .gutter-both {
+        scrollbar-gutter: stable both-edges;
+    }
+
+    .collapse-open {
+        @apply shrink-0;
+    }
+}
