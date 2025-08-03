@@ -5,8 +5,6 @@ import { envConfig } from './shared/env.config';
 import { TrainingsModule } from './trainings/trainings.module';
 import { UsersModule } from './users/users.module';
 
-console.log(envConfig.mongoUrl);
-
 @Module({
     imports: [MongooseModule.forRoot(envConfig.mongoUrl), UsersModule, TrainingsModule, AuthModule],
     controllers: [],

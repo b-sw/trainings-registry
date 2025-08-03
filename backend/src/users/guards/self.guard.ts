@@ -8,7 +8,6 @@ export class SelfGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
-
         // Check if user is admin first (admins can do anything)
         const user = await this.usersReadService.readById(request.user.id);
         if (user && user.role === Role.Admin) {
