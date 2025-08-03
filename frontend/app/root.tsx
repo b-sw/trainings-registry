@@ -1,9 +1,16 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
+import React from 'react';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 
-import type { Route } from './+types/root'
-import './app.css'
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import type { LinksFunction } from 'react-router';
+import { AuthWrapper } from './components/AuthWrapper';
+import { Sidebar } from './components/Sidebar';
+import { config, validateEnvironment } from './config/env';
+import { AuthProvider } from './utils/auth';
 
-export const links: Route.LinksFunction = () => [
+import './app.css';
+
+export const links: LinksFunction = () => [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     {
         rel: 'preconnect',
@@ -14,7 +21,7 @@ export const links: Route.LinksFunction = () => [
         rel: 'stylesheet',
         href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
     },
-]
+];
 
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
@@ -22,6 +29,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <title>Trainings Registry</title>
                 <Meta />
                 <Links />
             </head>
@@ -31,38 +39,36 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Scripts />
             </body>
         </html>
-    )
+    );
 }
 
 export default function App() {
-    return <Outlet />
-}
-
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-    let message = 'Oops!'
-    let details = 'An unexpected error occurred.'
-    let stack: string | undefined
-
-    if (isRouteErrorResponse(error)) {
-        message = error.status === 404 ? '404' : 'Error'
-        details =
-            error.status === 404
-                ? 'The requested page could not be found.'
-                : error.statusText || details
-    } else if (import.meta.env.DEV && error && error instanceof Error) {
-        details = error.message
-        stack = error.stack
+    // Validate environment variables on startup
+    if (typeof window !== 'undefined') {
+        validateEnvironment();
     }
 
     return (
-        <main className="pt-16 p-4 container mx-auto">
-            <h1>{message}</h1>
-            <p>{details}</p>
-            {stack && (
-                <pre className="w-full p-4 overflow-x-auto">
-                    <code>{stack}</code>
-                </pre>
-            )}
-        </main>
-    )
+        <GoogleOAuthProvider clientId={config.GOOGLE_OAUTH_CLIENT_ID}>
+            <AuthProvider>
+                <AuthWrapper>
+                    <div className="flex h-screen bg-gray-50">
+                        {/* Sidebar */}
+                        <div className="w-80 flex-shrink-0">
+                            <Sidebar />
+                        </div>
+
+                        {/* Main Content */}
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                            <main className="flex-1 overflow-y-auto">
+                                <div className="p-8">
+                                    <Outlet />
+                                </div>
+                            </main>
+                        </div>
+                    </div>
+                </AuthWrapper>
+            </AuthProvider>
+        </GoogleOAuthProvider>
+    );
 }
