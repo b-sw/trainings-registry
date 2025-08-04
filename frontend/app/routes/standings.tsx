@@ -245,46 +245,61 @@ export default function Standings() {
                     </div>
                 </div>
 
-                {/* Current User Stats */}
+                {/* User Summary Cards */}
                 {currentUserData && (
-                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 mb-8 text-white">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h2 className="text-xl font-bold mb-2">Your Performance</h2>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div>
-                                        <p className="text-blue-100 text-sm">Overall Rank</p>
-                                        <p className="text-2xl font-bold">
-                                            #{currentUserData.rank}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-blue-100 text-sm">Total Distance</p>
-                                        <p className="text-2xl font-bold">
-                                            {currentUserData.totalDistance.toFixed(1)} km
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-blue-100 text-sm">Activities</p>
-                                        <p className="text-2xl font-bold">
-                                            {currentUserData.activitiesCount}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-blue-100 text-sm">Average</p>
-                                        <p className="text-2xl font-bold">
-                                            {currentUserData.activitiesCount > 0
-                                                ? (
-                                                      currentUserData.totalDistance /
-                                                      currentUserData.activitiesCount
-                                                  ).toFixed(1)
-                                                : '0.0'}{' '}
-                                            km
-                                        </p>
-                                    </div>
-                                </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <h3 className="text-sm font-medium text-gray-600 mb-1">
+                                🏆 Overall Rank
+                            </h3>
+                            <div className="text-2xl font-bold text-blue-600">
+                                #{currentUserData.rank}
                             </div>
-                            <div className="text-6xl">{currentUserData.avatar}</div>
+                            <p className="text-gray-600 text-sm">
+                                {currentUserData.totalDistance.toFixed(1)} km total
+                            </p>
+                        </div>
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <h3 className="text-sm font-medium text-gray-600 mb-1">
+                                🚴‍♂️ Cycling Rank
+                            </h3>
+                            <div className="text-2xl font-bold text-blue-600">
+                                #
+                                {getRankingByCategory('cycling').findIndex(
+                                    (user) => user.isCurrentUser,
+                                ) + 1}
+                            </div>
+                            <p className="text-gray-600 text-sm">
+                                {currentUserData.cyclingDistance.toFixed(1)} km
+                            </p>
+                        </div>
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <h3 className="text-sm font-medium text-gray-600 mb-1">
+                                🏃‍♂️ Running Rank
+                            </h3>
+                            <div className="text-2xl font-bold text-green-600">
+                                #
+                                {getRankingByCategory('running').findIndex(
+                                    (user) => user.isCurrentUser,
+                                ) + 1}
+                            </div>
+                            <p className="text-gray-600 text-sm">
+                                {currentUserData.runningDistance.toFixed(1)} km
+                            </p>
+                        </div>
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <h3 className="text-sm font-medium text-gray-600 mb-1">
+                                🏊‍♂️ Other Rank
+                            </h3>
+                            <div className="text-2xl font-bold text-purple-600">
+                                #
+                                {getRankingByCategory('other').findIndex(
+                                    (user) => user.isCurrentUser,
+                                ) + 1}
+                            </div>
+                            <p className="text-gray-600 text-sm">
+                                {currentUserData.otherDistance.toFixed(1)} km
+                            </p>
                         </div>
                     </div>
                 )}
