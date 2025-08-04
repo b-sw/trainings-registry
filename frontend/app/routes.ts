@@ -6,5 +6,4 @@ export default [
     route('/standings', 'routes/standings.tsx'),
     route('/about', 'routes/about.tsx'),
     route('/home', 'routes/home.tsx'),
-    route('/training/:id', 'routes/training.$id.tsx'),
 ] satisfies RouteConfig
