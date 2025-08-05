@@ -68,6 +68,21 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
+// Response interceptor to handle 401 unauthorized
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Clear user data from localStorage
+            localStorage.removeItem('user');
+
+            // Redirect to landing page
+            window.location.href = '/';
+        }
+        return Promise.reject(error);
+    },
+);
+
 // Training API endpoints
 export const trainingApi = {
     // Get all trainings
@@ -85,6 +100,24 @@ export const trainingApi = {
     // Get user trainings
     getUserTrainings: async (userId: string): Promise<TrainingSerialized[]> => {
         const response = await apiClient.get(`/users/${userId}/trainings`);
+        return response.data;
+    },
+
+    // Get user trainings with pagination
+    getUserTrainingsPaginated: async (
+        userId: string,
+        skip: number = 0,
+        limit: number = 20,
+    ): Promise<{
+        trainings: TrainingSerialized[];
+        total: number;
+        hasMore: boolean;
+        skip: number;
+        limit: number;
+    }> => {
+        const response = await apiClient.get(
+            `/users/${userId}/trainings?skip=${skip}&limit=${limit}`,
+        );
         return response.data;
     },
 

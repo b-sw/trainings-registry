@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Activity } from '../utils/api';
 import { mapTrainingToActivity, trainingApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
@@ -7,8 +7,14 @@ export default function MyTrainings() {
     const { user } = useAuth();
     const [activities, setActivities] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showAddForm, setShowAddForm] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [skip, setSkip] = useState(0);
+    const limit = 20;
+    const observerRef = useRef<HTMLDivElement>(null);
+
     const [newActivity, setNewActivity] = useState<Omit<Activity, 'id'>>({
         type: 'running',
         distance: 0,
@@ -17,27 +23,82 @@ export default function MyTrainings() {
         notes: '',
     });
 
-    // Load user activities on component mount
-    useEffect(() => {
-        const loadActivities = async () => {
+    // Load activities with pagination
+    const loadActivities = useCallback(
+        async (skipCount: number = 0, append: boolean = false) => {
             if (!user?.id) return;
 
             try {
-                setLoading(true);
+                if (!append) {
+                    setLoading(true);
+                } else {
+                    setLoadingMore(true);
+                }
                 setError(null);
-                const trainings = await trainingApi.getUserTrainings(user.id);
-                const mappedActivities = trainings.map(mapTrainingToActivity);
-                setActivities(mappedActivities);
+
+                const response = await trainingApi.getUserTrainingsPaginated(
+                    user.id,
+                    skipCount,
+                    limit,
+                );
+                const mappedActivities = response.trainings.map(mapTrainingToActivity);
+
+                if (append) {
+                    setActivities((prev) => [...prev, ...mappedActivities]);
+                } else {
+                    setActivities(mappedActivities);
+                }
+
+                setHasMore(response.hasMore);
+                setSkip(skipCount + response.trainings.length);
             } catch (err) {
                 console.error('Failed to load activities:', err);
                 setError('Failed to load activities. Please try again.');
             } finally {
                 setLoading(false);
+                setLoadingMore(false);
+            }
+        },
+        [user?.id, limit],
+    );
+
+    // Load more activities when scrolling
+    const loadMore = useCallback(() => {
+        if (!loadingMore && hasMore && user?.id) {
+            loadActivities(skip, true);
+        }
+    }, [loadActivities, loadingMore, hasMore, skip, user?.id]);
+
+    // Initial load
+    useEffect(() => {
+        loadActivities(0, false);
+    }, [loadActivities]);
+
+    // Intersection Observer for infinite scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const target = entries[0];
+                if (target.isIntersecting && hasMore && !loadingMore) {
+                    loadMore();
+                }
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '100px',
+            },
+        );
+
+        if (observerRef.current) {
+            observer.observe(observerRef.current);
+        }
+
+        return () => {
+            if (observerRef.current) {
+                observer.unobserve(observerRef.current);
             }
         };
-
-        loadActivities();
-    }, [user?.id]);
+    }, [loadMore, hasMore, loadingMore]);
 
     // Calculate stats
     const totalDistance = activities.reduce((sum, activity) => sum + activity.distance, 0);
@@ -52,7 +113,7 @@ export default function MyTrainings() {
         .reduce((sum, a) => sum + a.distance, 0);
 
     const getActivityIcon = (type: string) =>
-        type === 'running' ? '🏃‍♂️' : type === 'cycling' ? '🚴‍♂️' : '🏊‍♂️';
+        type === 'running' ? '🏃‍♂️' : type === 'cycling' ? '🚴‍♂️' : '⭐';
 
     const getActivityColor = (type: string) =>
         type === 'running'
@@ -81,10 +142,9 @@ export default function MyTrainings() {
                 date: newActivity.date,
             };
 
-            const newTraining = await trainingApi.create(trainingData);
-            const newMappedActivity = mapTrainingToActivity(newTraining);
+            await trainingApi.create(trainingData);
 
-            setActivities([newMappedActivity, ...activities]);
+            // Reset form and close
             setNewActivity({
                 type: 'running',
                 distance: 0,
@@ -93,6 +153,11 @@ export default function MyTrainings() {
                 notes: '',
             });
             setShowAddForm(false);
+
+            // Reload activities from the beginning
+            setSkip(0);
+            setHasMore(true);
+            await loadActivities(0, false);
         } catch (err) {
             console.error('Failed to create activity:', err);
             setError('Failed to create activity. Please try again.');
@@ -131,10 +196,10 @@ export default function MyTrainings() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-8 flex-shrink-0">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">My Activities</h1>
                         <p className="mt-2 text-gray-600">
@@ -151,7 +216,7 @@ export default function MyTrainings() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 flex-shrink-0">
                     <div className="bg-white rounded-lg shadow p-6">
                         <div className="flex items-center">
                             <div className="p-2 bg-indigo-100 rounded-lg">
@@ -199,7 +264,7 @@ export default function MyTrainings() {
                     <div className="bg-white rounded-lg shadow p-6">
                         <div className="flex items-center">
                             <div className="p-2 bg-purple-100 rounded-lg">
-                                <span className="text-2xl">🏊‍♂️</span>
+                                <span className="text-2xl">⭐</span>
                             </div>
                             <div className="ml-4">
                                 <h3 className="text-sm font-medium text-gray-500">Other</h3>
@@ -213,7 +278,7 @@ export default function MyTrainings() {
 
                 {/* Add Activity Form */}
                 {showAddForm && (
-                    <div className="bg-white rounded-lg shadow p-6 mb-6">
+                    <div className="bg-white rounded-lg shadow p-6 mb-6 flex-shrink-0">
                         <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Activity</h3>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -290,7 +355,7 @@ export default function MyTrainings() {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-primary-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                    className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 >
                                     Add Activity
                                 </button>
@@ -300,13 +365,13 @@ export default function MyTrainings() {
                 )}
 
                 {/* Activities List */}
-                <div className="bg-white rounded-lg shadow">
-                    <div className="px-6 py-4 border-b border-gray-200">
+                <div className="bg-white rounded-lg shadow flex-1 flex flex-col min-h-0">
+                    <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
                         <h3 className="text-lg font-medium text-gray-900">Recent Activities</h3>
                     </div>
 
                     {activities.length === 0 ? (
-                        <div className="px-6 py-12 text-center">
+                        <div className="px-6 py-12 text-center flex-1 flex flex-col justify-center">
                             <span className="text-6xl mb-4 block">🏃‍♂️</span>
                             <h3 className="text-lg font-medium text-gray-900 mb-2">
                                 No activities yet
@@ -316,54 +381,73 @@ export default function MyTrainings() {
                             </p>
                             <button
                                 onClick={() => setShowAddForm(true)}
-                                className="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-primary-700"
+                                className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700"
                             >
                                 Add Your First Activity
                             </button>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-200">
-                            {activities.map((activity) => (
-                                <div key={activity.id} className="px-6 py-4 hover:bg-gray-50">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="flex-shrink-0">
-                                                <span className="text-2xl">
-                                                    {getActivityIcon(activity.type)}
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center space-x-2">
-                                                    <span
-                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActivityColor(
-                                                            activity.type,
-                                                        )}`}
-                                                    >
-                                                        {activity.type.charAt(0).toUpperCase() +
-                                                            activity.type.slice(1)}
-                                                    </span>
-                                                    <span className="text-sm text-gray-500">
-                                                        {activity.date}
+                        <div className="flex-1 overflow-y-auto">
+                            <div className="divide-y divide-gray-200">
+                                {activities.map((activity) => (
+                                    <div key={activity.id} className="px-6 py-4 hover:bg-gray-50">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-4">
+                                                <div className="flex-shrink-0">
+                                                    <span className="text-2xl">
+                                                        {getActivityIcon(activity.type)}
                                                     </span>
                                                 </div>
-                                                {activity.notes && (
-                                                    <p className="text-sm text-gray-600 mt-1">
-                                                        {activity.notes}
-                                                    </p>
-                                                )}
+                                                <div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <span
+                                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActivityColor(
+                                                                activity.type,
+                                                            )}`}
+                                                        >
+                                                            {activity.type.charAt(0).toUpperCase() +
+                                                                activity.type.slice(1)}
+                                                        </span>
+                                                        <span className="text-sm text-gray-500">
+                                                            {activity.date}
+                                                        </span>
+                                                    </div>
+                                                    {activity.notes && (
+                                                        <p className="text-sm text-gray-600 mt-1">
+                                                            {activity.notes}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex items-center space-x-6 text-sm text-gray-500">
                                             <div className="text-right">
                                                 <p className="font-medium text-gray-900">
                                                     {activity.distance} km
                                                 </p>
-                                                <p>{formatDuration(activity.duration)}</p>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+
+                                {/* Loading indicator for infinite scroll */}
+                                {loadingMore && (
+                                    <div className="px-6 py-4 text-center">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                                        <p className="mt-2 text-sm text-gray-600">
+                                            Loading more activities...
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Observer element for infinite scroll */}
+                                <div ref={observerRef} className="h-4"></div>
+
+                                {/* End of data indicator */}
+                                {!hasMore && activities.length > 0 && (
+                                    <div className="px-6 py-4 text-center text-sm text-gray-500">
+                                        You've reached the end of your activities
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

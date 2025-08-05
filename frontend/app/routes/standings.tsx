@@ -25,10 +25,6 @@ export default function Standings() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [dateRange, setDateRange] = useState({
-        startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0], // Start of current year
-        endDate: new Date().toISOString().split('T')[0], // Today
-    });
 
     // Load standings data
     useEffect(() => {
@@ -37,10 +33,16 @@ export default function Standings() {
                 setLoading(true);
                 setError(null);
 
+                // Fixed date range: start of year to today
+                const startDate = new Date(new Date().getFullYear(), 0, 1)
+                    .toISOString()
+                    .split('T')[0];
+                const endDate = new Date().toISOString().split('T')[0];
+
                 // Fetch all users and their activities
                 const [allUsers, userActivities] = await Promise.all([
                     userApi.getAll(),
-                    trainingApi.getAllUsersActivities(dateRange.startDate, dateRange.endDate),
+                    trainingApi.getAllUsersActivities(startDate, endDate),
                 ]);
 
                 // Map activities to users with distance breakdown
@@ -122,7 +124,7 @@ export default function Standings() {
         };
 
         loadStandings();
-    }, [currentUser?.id, dateRange.startDate, dateRange.endDate]);
+    }, [currentUser?.id]);
 
     const getAvatarForUser = (name: string, index: number): string => {
         if (index === 0) return '🏆';
@@ -201,48 +203,23 @@ export default function Standings() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Global Standings</h1>
-                    <p className="mt-2 text-gray-600">
-                        See how you rank against other team members in various activities.
-                    </p>
-                </div>
-
-                {/* Date Range Filter */}
-                <div className="bg-white rounded-lg shadow p-6 mb-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Filter by Date Range</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Start Date
-                            </label>
-                            <input
-                                type="date"
-                                value={dateRange.startDate}
-                                onChange={(e) =>
-                                    setDateRange((prev) => ({ ...prev, startDate: e.target.value }))
-                                }
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                End Date
-                            </label>
-                            <input
-                                type="date"
-                                value={dateRange.endDate}
-                                onChange={(e) =>
-                                    setDateRange((prev) => ({ ...prev, endDate: e.target.value }))
-                                }
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                max={new Date().toISOString().split('T')[0]}
-                            />
-                        </div>
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">Global Standings</h1>
+                        <p className="mt-2 text-gray-600">
+                            See how you rank against other team members in various activities.
+                        </p>
                     </div>
+                    <button
+                        onClick={() => (window.location.href = '/my-trainings?add=true')}
+                        className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        <span className="mr-2">+</span>
+                        Add Activity
+                    </button>
                 </div>
 
                 {/* User Summary Cards */}
@@ -289,7 +266,7 @@ export default function Standings() {
                         </div>
                         <div className="bg-white rounded-lg shadow p-6">
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
-                                🏊‍♂️ Other Rank
+                                ⭐ Other Rank
                             </h3>
                             <div className="text-2xl font-bold text-purple-600">
                                 #
@@ -312,7 +289,7 @@ export default function Standings() {
                                 { key: 'all' as const, label: 'All Activities', icon: '🏆' },
                                 { key: 'cycling' as const, label: 'Cycling', icon: '🚴‍♂️' },
                                 { key: 'running' as const, label: 'Running', icon: '🏃‍♂️' },
-                                { key: 'other' as const, label: 'Other', icon: '🏊‍♂️' },
+                                { key: 'other' as const, label: 'Other', icon: '⭐' },
                             ].map((tab) => (
                                 <button
                                     key={tab.key}
@@ -353,7 +330,7 @@ export default function Standings() {
                             </p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-200">
+                        <div className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
                             {displayUsers.map((user) => (
                                 <div
                                     key={user.id}
@@ -412,7 +389,7 @@ export default function Standings() {
                                             {activeTab === 'all' && (
                                                 <div className="text-sm text-gray-500 mt-1">
                                                     🚴‍♂️ {user.cyclingDistance.toFixed(1)} • 🏃‍♂️{' '}
-                                                    {user.runningDistance.toFixed(1)} • 🏊‍♂️{' '}
+                                                    {user.runningDistance.toFixed(1)} • ⭐{' '}
                                                     {user.otherDistance.toFixed(1)}
                                                 </div>
                                             )}
