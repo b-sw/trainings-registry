@@ -289,7 +289,7 @@ export default function MyTrainings() {
                                     <select
                                         value={newActivity.type}
                                         onChange={(e) => handleInputChange('type', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option value="running">Running</option>
                                         <option value="cycling">Cycling</option>
@@ -312,7 +312,7 @@ export default function MyTrainings() {
                                                 parseFloat(e.target.value) || 0,
                                             )
                                         }
-                                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         placeholder="0.0"
                                         required
                                     />
@@ -326,7 +326,7 @@ export default function MyTrainings() {
                                         type="date"
                                         value={newActivity.date}
                                         onChange={(e) => handleInputChange('date', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         required
                                     />
                                 </div>
@@ -340,7 +340,7 @@ export default function MyTrainings() {
                                     value={newActivity.notes || ''}
                                     onChange={(e) => handleInputChange('notes', e.target.value)}
                                     rows={3}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="Add any notes about your activity..."
                                 />
                             </div>
@@ -349,7 +349,7 @@ export default function MyTrainings() {
                                 <button
                                     type="button"
                                     onClick={() => setShowAddForm(false)}
-                                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 >
                                     Cancel
                                 </button>
@@ -387,7 +387,7 @@ export default function MyTrainings() {
                             </button>
                         </div>
                     ) : (
-                        <div className="flex-1 overflow-y-auto">
+                        <div className="flex-1 overflow-y-auto scrollbar-custom">
                             <div className="divide-y divide-gray-200">
                                 {activities.map((activity) => (
                                     <div key={activity.id} className="px-6 py-4 hover:bg-gray-50">
@@ -439,14 +439,7 @@ export default function MyTrainings() {
                                 )}
 
                                 {/* Observer element for infinite scroll */}
-                                <div ref={observerRef} className="h-4"></div>
-
-                                {/* End of data indicator */}
-                                {!hasMore && activities.length > 0 && (
-                                    <div className="px-6 py-4 text-center text-sm text-gray-500">
-                                        You've reached the end of your activities
-                                    </div>
-                                )}
+                                <div ref={observerRef} className="h-0"></div>
                             </div>
                         </div>
                     )}
