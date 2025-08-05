@@ -155,11 +155,50 @@ describe('TrainingsController (reads)', () => {
 
             // then
             expect(response.status).toBe(200);
-            expect(response.body).toHaveLength(1);
-            expect(response.body[0]).toMatchObject({
+            expect(response.body).toMatchObject({
+                trainings: expect.any(Array),
+                total: 1,
+                hasMore: false,
+                skip: 0,
+                limit: 20,
+            });
+            expect(response.body.trainings).toHaveLength(1);
+            expect(response.body.trainings[0]).toMatchObject({
                 title: 'User1 Training',
                 userId: user1.id,
             });
+        });
+
+        it('returns paginated trainings with custom skip and limit', async () => {
+            // given
+            const user = await bootstrap.utils.userUtils.createDefaultUser();
+            const adminUser = await bootstrap.utils.userUtils.createAdminUser();
+            const token = bootstrap.utils.authUtils.generateToken(adminUser);
+
+            // Create 5 trainings
+            for (let i = 1; i <= 5; i++) {
+                await bootstrap.utils.trainingUtils.createTraining({
+                    userId: user.id,
+                    title: `Training ${i}`,
+                    distance: i,
+                });
+            }
+
+            // when
+            const response = await request(bootstrap.app.getHttpServer())
+                .get(`/users/${user.id}/trainings?skip=2&limit=2`)
+                .set('Authorization', `Bearer ${token}`);
+
+            // then
+            expect(response.status).toBe(200);
+            expect(response.body).toMatchObject({
+                trainings: expect.any(Array),
+                total: 5,
+                hasMore: true,
+                skip: 2,
+                limit: 2,
+            });
+            expect(response.body.trainings).toHaveLength(2);
         });
 
         it('returns empty array for user with no trainings', async () => {
@@ -175,7 +214,29 @@ describe('TrainingsController (reads)', () => {
 
             // then
             expect(response.status).toBe(200);
-            expect(response.body).toHaveLength(0);
+            expect(response.body).toMatchObject({
+                trainings: [],
+                total: 0,
+                hasMore: false,
+                skip: 0,
+                limit: 20,
+            });
+        });
+
+        it('limits maximum results to 100', async () => {
+            // given
+            const user = await bootstrap.utils.userUtils.createDefaultUser();
+            const adminUser = await bootstrap.utils.userUtils.createAdminUser();
+            const token = bootstrap.utils.authUtils.generateToken(adminUser);
+
+            // when
+            const response = await request(bootstrap.app.getHttpServer())
+                .get(`/users/${user.id}/trainings?limit=150`)
+                .set('Authorization', `Bearer ${token}`);
+
+            // then
+            expect(response.status).toBe(200);
+            expect(response.body.limit).toBe(100); // Should be capped at 100
         });
     });
 

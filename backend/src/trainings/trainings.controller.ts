@@ -8,9 +8,10 @@ import {
     Param,
     Post,
     Put,
+    Query,
     UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { AdminGuard } from '../users/guards/admin.guard';
 import { SelfGuard } from '../users/guards/self.guard';
@@ -86,10 +87,46 @@ export class TrainingsController {
 
     @Get('users/:userId/trainings')
     @UseGuards(JwtGuard)
-    @ApiOperation({ summary: 'Get user trainings' })
-    async getUserTrainings(@Param('userId') userId: string): Promise<TrainingSerialized[]> {
-        const trainings = await this.trainingsReadService.readByUserId(userId);
-        return TrainingSerializer.serializeMany(trainings);
+    @ApiOperation({ summary: 'Get user trainings with pagination support' })
+    @ApiQuery({
+        name: 'skip',
+        required: false,
+        type: Number,
+        description: 'Number of trainings to skip',
+    })
+    @ApiQuery({
+        name: 'limit',
+        required: false,
+        type: Number,
+        description: 'Number of trainings to return (max 100)',
+    })
+    async getUserTrainings(
+        @Param('userId') userId: string,
+        @Query('skip') skip?: string,
+        @Query('limit') limit?: string,
+    ): Promise<{
+        trainings: TrainingSerialized[];
+        total: number;
+        hasMore: boolean;
+        skip: number;
+        limit: number;
+    }> {
+        const skipNum = skip ? parseInt(skip, 10) : 0;
+        const limitNum = limit ? Math.min(parseInt(limit, 10), 100) : 20; // Max 100 to prevent abuse
+
+        const result = await this.trainingsReadService.readByUserIdPaginated(
+            userId,
+            skipNum,
+            limitNum,
+        );
+
+        return {
+            trainings: TrainingSerializer.serializeMany(result.trainings),
+            total: result.total,
+            hasMore: result.hasMore,
+            skip: skipNum,
+            limit: limitNum,
+        };
     }
 
     @Post('users/:userId/activities')

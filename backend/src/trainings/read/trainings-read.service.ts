@@ -42,6 +42,36 @@ export class TrainingsReadService {
         return TrainingSerializer.normalizeMany(entities);
     }
 
+    public async readByUserIdPaginated(
+        userId: string,
+        skip: number = 0,
+        limit: number = 20,
+    ): Promise<{
+        trainings: TrainingNormalized[];
+        total: number;
+        hasMore: boolean;
+    }> {
+        const [entities, total] = await Promise.all([
+            this.trainingModel
+                .find({ userId })
+                .sort({ date: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean<TrainingEntity[]>()
+                .exec(),
+            this.trainingModel.countDocuments({ userId }).exec(),
+        ]);
+
+        const trainings = TrainingSerializer.normalizeMany(entities);
+        const hasMore = skip + limit < total;
+
+        return {
+            trainings,
+            total,
+            hasMore,
+        };
+    }
+
     public async readByDateRange(startDate: Date, endDate: Date): Promise<TrainingNormalized[]> {
         const entities = await this.trainingModel
             .find({
