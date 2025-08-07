@@ -1,0 +1,61 @@
+name: Deploy backend (dev)
+
+on:
+  push:
+    branches:
+      - dev
+
+defaults:
+  run:
+    working-directory: ./backend
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run e2e tests
+        run: yarn test:e2e
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build and push
+        uses: "./.github/templates/build-and-push"
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          image-name: ${{ secrets.DOCKER_IMAGE_NAME }}
+      - name: Deploy
+        uses: "./.github/templates/deploy-backend-container"
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          server-port: 3000
+          application-port: 3000
+          image-name: ${{ secrets.DOCKER_IMAGE_NAME }}
+          container-name: trainings-registry-backend-dev
+          swagger-username: ${{ secrets.BACKEND_DEV_SWAGGER_USERNAME }}
+          swagger-password: ${{ secrets.BACKEND_DEV_SWAGGER_PASSWORD }}
+          mongo-url: ${{ secrets.BACKEND_DEV_MONGO_URL }}
+          jwt-secret: ${{ secrets.BACKEND_DEV_JWT_SECRET }}
+          dev-auth-password: ${{ secrets.BACKEND_DEV_AUTH_PASSWORD }}
+      - name: Prune
+        uses: "./.github/templates/prune"
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
