@@ -11,14 +11,14 @@ export class TrainingEntity {
     @Prop({ required: true })
     title: string;
 
-    @Prop({ required: true })
+    @Prop()
     description: string;
 
     @Prop({ required: true })
     date: Date;
 
     @Prop({ required: true })
-    distance: number; // in kilometers
+    distance: number;
 
     createdAt: Date;
     updatedAt: Date;

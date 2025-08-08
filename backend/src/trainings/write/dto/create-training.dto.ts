@@ -13,7 +13,7 @@ export class CreateTrainingDto {
     title: string;
 
     @ApiProperty()
-    @IsNotEmpty()
+    // @IsNotEmpty()
     @IsString()
     description: string;
 
