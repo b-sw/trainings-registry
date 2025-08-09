@@ -321,7 +321,7 @@ export default function Standings() {
                             </p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-200 overflow-y-auto flex-1 min-h-0">
+                        <div className="divide-y divide-gray-200 overflow-y-auto flex-1 min-h-0 scrollbar-custom">
                             {displayUsers.map((user) => (
                                 <div
                                     key={user.id}
