@@ -52,6 +52,7 @@ jobs:
           mongo-url: ${{ secrets.BACKEND_DEV_MONGO_URL }}
           jwt-secret: ${{ secrets.BACKEND_DEV_JWT_SECRET }}
           dev-auth-password: ${{ secrets.BACKEND_DEV_AUTH_PASSWORD }}
+          is-dev-environment: true
       - name: Prune
         uses: "./.github/templates/prune"
         with:
