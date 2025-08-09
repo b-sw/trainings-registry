@@ -1,46 +1,49 @@
-import { useGoogleLogin } from '@react-oauth/google'
-import React, { useState } from 'react'
-import { useAuth } from '../utils/auth'
+import { useGoogleLogin } from '@react-oauth/google';
+import React, { useState } from 'react';
+import { useAuth } from '../utils/auth';
 
 interface GoogleLoginButtonProps {
-    className?: string
-    children?: React.ReactNode
+    className?: string;
+    children?: React.ReactNode;
 }
 
 export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
     className = '',
     children,
 }) => {
-    const { login } = useAuth()
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const { login } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const googleLogin = useGoogleLogin({
         onSuccess: async (codeResponse) => {
-            setIsLoading(true)
-            setError(null)
+            setIsLoading(true);
+            setError(null);
             try {
-                await login(codeResponse.access_token)
+                await login(codeResponse.access_token);
             } catch (err) {
-                console.error('Login failed:', err)
-                setError(err instanceof Error ? err.message : 'Login failed')
+                console.error('Login failed:', err);
+                setError(err instanceof Error ? err.message : 'Login failed');
             } finally {
-                setIsLoading(false)
+                setIsLoading(false);
             }
         },
         onError: (error) => {
-            console.error('Google login error:', error)
-            setError('Google authentication failed')
+            console.error('Google login error:', error);
+            setError('Google authentication failed');
         },
-    })
+    });
 
     return (
-        <div className="flex flex-col items-center">
+        <div
+            className="w-full flex flex-col items-start"
+            style={{ fontSize: 'clamp(12px, 5vw, 64px)' }}
+        >
             <button
                 onClick={() => googleLogin()}
                 disabled={isLoading}
                 className={`
-                    flex items-center justify-center px-8 py-4 
+                    w-full sm:w-auto flex items-center justify-center px-8 py-4 
                     bg-white text-gray-700 font-semibold rounded-lg shadow-lg 
                     hover:shadow-xl transform hover:scale-105 transition-all duration-200
                     disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
@@ -50,12 +53,19 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
             >
                 {isLoading ? (
                     <div className="flex items-center">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
-                        <span className="text-lg">Signing in...</span>
+                        <div
+                            className="animate-spin rounded-full border-b-2 border-blue-600 mr-3"
+                            style={{ width: '1em', height: '1em' }}
+                        ></div>
+                        <span className="whitespace-nowrap">Signing in...</span>
                     </div>
                 ) : (
                     <div className="flex items-center">
-                        <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24">
+                        <svg
+                            className="mr-3"
+                            viewBox="0 0 24 24"
+                            style={{ width: '1em', height: '1em' }}
+                        >
                             <path
                                 fill="#4285F4"
                                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -73,11 +83,13 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
                                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                             />
                         </svg>
-                        <span className="text-lg">{children || 'Sign in with Google'}</span>
+                        <span className="whitespace-nowrap">
+                            {children || 'Sign in with Google'}
+                        </span>
                     </div>
                 )}
             </button>
             {error && <p className="text-red-500 text-sm mt-2 text-center max-w-xs">{error}</p>}
         </div>
-    )
-}
+    );
+};

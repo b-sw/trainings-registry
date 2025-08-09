@@ -12,6 +12,11 @@ export class TrainingsReadService {
         private readonly trainingModel: Model<TrainingEntity>,
     ) {}
 
+    // In-memory cache for total distance across all trainings
+    private totalDistanceCacheValue: number | null = null;
+    private totalDistanceCacheTimestampMs: number = 0;
+    private readonly totalDistanceCacheTtlMs: number = 60_000; // 60 seconds
+
     public async readById(id: string): Promise<TrainingNormalized | null> {
         const entity = await this.trainingModel.findById(id).lean<TrainingEntity>().exec();
 
@@ -97,11 +102,23 @@ export class TrainingsReadService {
     }
 
     public async getTotalDistance(): Promise<number> {
+        const now = Date.now();
+        const isCacheValid =
+            this.totalDistanceCacheValue !== null &&
+            now - this.totalDistanceCacheTimestampMs < this.totalDistanceCacheTtlMs;
+
+        if (isCacheValid) {
+            return this.totalDistanceCacheValue as number;
+        }
+
         const result = await this.trainingModel.aggregate([
             { $group: { _id: null, totalDistance: { $sum: '$distance' } } },
         ]);
 
-        return result.length > 0 ? result[0].totalDistance : 0;
+        const value = result.length > 0 ? result[0].totalDistance : 0;
+        this.totalDistanceCacheValue = value;
+        this.totalDistanceCacheTimestampMs = now;
+        return value;
     }
 
     public async countAll(): Promise<number> {

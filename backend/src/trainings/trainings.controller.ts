@@ -47,6 +47,13 @@ export class TrainingsController {
         return { totalDistance };
     }
 
+    @Get('public/total-kilometers')
+    @ApiOperation({ summary: 'Public total kilometers across all trainings' })
+    async getPublicTotalKilometers(): Promise<{ totalKilometers: number }> {
+        const totalKilometers = await this.trainingsReadService.getTotalDistance();
+        return { totalKilometers };
+    }
+
     @Get('trainings/:trainingId')
     @UseGuards(JwtGuard)
     @ApiOperation({ summary: 'Get training by id' })

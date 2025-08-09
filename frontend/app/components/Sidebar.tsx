@@ -1,9 +1,9 @@
-import { Link, useLocation } from 'react-router'
-import { useAuth } from '../utils/auth'
+import { Link, useLocation } from 'react-router';
+import { useAuth } from '../utils/auth';
 
 export function Sidebar() {
-    const location = useLocation()
-    const { user, logout } = useAuth()
+    const location = useLocation();
+    const { user, logout } = useAuth();
 
     const navigation = [
         {
@@ -21,7 +21,7 @@ export function Sidebar() {
             href: '/about',
             icon: 'ℹ️',
         },
-    ]
+    ];
 
     return (
         <div className="flex flex-col h-full bg-white border-r border-gray-200">
@@ -52,7 +52,7 @@ export function Sidebar() {
             {/* Navigation */}
             <nav className="flex-1 px-4 space-y-1">
                 {navigation.map((item) => {
-                    const isActive = location.pathname === item.href
+                    const isActive = location.pathname === item.href;
                     return (
                         <Link
                             key={item.name}
@@ -62,7 +62,7 @@ export function Sidebar() {
                             <span className="text-lg">{item.icon}</span>
                             <span>{item.name}</span>
                         </Link>
-                    )
+                    );
                 })}
             </nav>
 
@@ -100,5 +100,5 @@ export function Sidebar() {
                 </button>
             </div>
         </div>
-    )
+    );
 }

@@ -247,6 +247,15 @@ export const userApi = {
     },
 };
 
+// Public API endpoints
+export const publicApi = {
+    // Get total kilometers completed publicly
+    getTotalKilometers: async (): Promise<{ totalKilometers: number }> => {
+        const response = await apiClient.get('/public/total-kilometers');
+        return response.data;
+    },
+};
+
 // Helper functions to map backend data to frontend format
 export const mapTrainingToActivity = (training: TrainingSerialized): Activity => {
     // Determine activity type from title/description (simple heuristic)
@@ -283,4 +292,4 @@ export const mapTrainingToActivity = (training: TrainingSerialized): Activity =>
     };
 };
 
-export default { trainingApi, userApi };
+export default { trainingApi, userApi, publicApi };

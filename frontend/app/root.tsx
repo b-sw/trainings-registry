@@ -21,6 +21,10 @@ export const links: LinksFunction = () => [
         rel: 'stylesheet',
         href: 'https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap',
     },
+    {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap',
+    },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
