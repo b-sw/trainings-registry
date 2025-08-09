@@ -67,6 +67,7 @@ export class AuthService {
             email: googleUser.email,
             name: `${googleUser.given_name} ${googleUser.family_name}`,
             role: Role.User,
+            imageUrl: googleUser.picture,
         });
     }
 

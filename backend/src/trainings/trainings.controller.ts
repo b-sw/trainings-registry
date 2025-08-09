@@ -171,7 +171,9 @@ export class TrainingsController {
     async getAllUsersActivities(@Body() dto: ActivityDto): Promise<
         {
             userId: string;
-            totalDistance: number;
+            runningDistance: number;
+            cyclingDistance: number;
+            walkingDistance: number;
             totalTrainings: number;
         }[]
     > {
@@ -180,23 +182,40 @@ export class TrainingsController {
             new Date(dto.endDate),
         );
 
-        // Group by userId
+        // Group by userId with per-activity totals
         const userActivities = trainings.reduce(
             (acc, training) => {
                 if (!acc[training.userId]) {
                     acc[training.userId] = {
                         userId: training.userId,
-                        totalDistance: 0,
+                        runningDistance: 0,
+                        cyclingDistance: 0,
+                        walkingDistance: 0,
                         totalTrainings: 0,
                     };
                 }
 
-                acc[training.userId].totalDistance += training.distance;
+                if (training.activityType === 'running') {
+                    acc[training.userId].runningDistance += training.distance;
+                } else if (training.activityType === 'cycling') {
+                    acc[training.userId].cyclingDistance += training.distance;
+                } else if (training.activityType === 'walking') {
+                    acc[training.userId].walkingDistance += training.distance;
+                }
                 acc[training.userId].totalTrainings += 1;
 
                 return acc;
             },
-            {} as Record<string, { userId: string; totalDistance: number; totalTrainings: number }>,
+            {} as Record<
+                string,
+                {
+                    userId: string;
+                    runningDistance: number;
+                    cyclingDistance: number;
+                    walkingDistance: number;
+                    totalTrainings: number;
+                }
+            >,
         );
 
         const list = Object.values(userActivities);

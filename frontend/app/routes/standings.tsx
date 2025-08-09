@@ -49,47 +49,21 @@ export default function Standings() {
                 const usersMap = new Map<string, UserSerialized>();
                 allUsers.forEach((user) => usersMap.set(user.id, user));
 
-                // Get detailed trainings for distance breakdown by type
-                const allTrainings = await trainingApi.getAll();
-                const trainingsByUser = allTrainings.reduce(
-                    (acc, training) => {
-                        if (!acc[training.userId]) {
-                            acc[training.userId] = [];
-                        }
-                        acc[training.userId].push(training);
-                        return acc;
-                    },
-                    {} as Record<string, typeof allTrainings>,
-                );
-
-                // Calculate distance by activity type for each user
+                // Build standings using precomputed distances from backend
                 const standingsData: User[] = userActivities.map((activity, index) => {
                     const userData = usersMap.get(activity.userId);
-                    const userTrainings = trainingsByUser[activity.userId] || [];
 
-                    // Calculate distances by type based on training.activityType
-                    let cyclingDistance = 0;
-                    let runningDistance = 0;
-                    let walkingDistance = 0;
-
-                    userTrainings.forEach((training) => {
-                        const type = training.activityType;
-
-                        if (type === 'running') {
-                            runningDistance += training.distance;
-                        } else if (type === 'cycling') {
-                            cyclingDistance += training.distance;
-                        } else {
-                            walkingDistance += training.distance;
-                        }
-                    });
+                    const runningDistance = activity.runningDistance || 0;
+                    const cyclingDistance = activity.cyclingDistance || 0;
+                    const walkingDistance = activity.walkingDistance || 0;
+                    const totalDistance = runningDistance + cyclingDistance + walkingDistance;
 
                     return {
                         rank: index + 1, // Will be recalculated based on sorting
                         name: userData?.name || 'Unknown User',
                         email: userData?.email || '',
                         id: activity.userId,
-                        totalDistance: activity.totalDistance,
+                        totalDistance,
                         cyclingDistance,
                         runningDistance,
                         walkingDistance,
@@ -325,11 +299,7 @@ export default function Standings() {
                             {displayUsers.map((user) => (
                                 <div
                                     key={user.id}
-                                    className={`px-6 py-4 hover:bg-gray-50 ${
-                                        user.isCurrentUser
-                                            ? 'bg-blue-50 border-l-4 border-blue-400'
-                                            : ''
-                                    }`}
+                                    className={`px-6 py-4 hover:bg-gray-50 ${user.isCurrentUser ? 'bg-blue-50 border-l-4 border-blue-400' : ''}`}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-4">

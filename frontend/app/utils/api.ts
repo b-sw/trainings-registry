@@ -24,7 +24,9 @@ export interface UserSerialized {
 
 export interface UserActivity {
     userId: string;
-    totalDistance: number;
+    runningDistance: number;
+    cyclingDistance: number;
+    walkingDistance: number;
     totalTrainings: number;
 }
 
@@ -230,11 +232,7 @@ export const userApi = {
     // Update user
     update: async (
         userId: string,
-        user: Partial<{
-            email: string;
-            name: string;
-            role: 'Admin' | 'Employee';
-        }>,
+        user: Partial<{ email: string; name: string; role: 'Admin' | 'Employee' }>,
     ): Promise<UserSerialized> => {
         const response = await apiClient.put(`/users/${userId}`, user);
         return response.data;

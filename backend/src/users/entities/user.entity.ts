@@ -20,6 +20,9 @@ export class UserEntity {
     @Prop({ required: true, enum: Role, default: Role.User })
     role: Role;
 
+    @Prop()
+    imageUrl?: string;
+
     createdAt: Date;
     updatedAt: Date;
 }

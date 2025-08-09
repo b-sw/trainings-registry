@@ -318,12 +318,16 @@ describe('TrainingsController (reads)', () => {
 
             expect(user1Activity).toMatchObject({
                 userId: user1.id,
-                totalDistance: 5.0,
+                runningDistance: 5.0,
+                cyclingDistance: 0,
+                walkingDistance: 0,
                 totalTrainings: 1,
             });
             expect(user2Activity).toMatchObject({
                 userId: user2.id,
-                totalDistance: 3.0,
+                runningDistance: 0,
+                cyclingDistance: 0,
+                walkingDistance: 3.0,
                 totalTrainings: 1,
             });
         });
