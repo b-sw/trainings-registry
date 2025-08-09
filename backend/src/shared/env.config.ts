@@ -9,6 +9,7 @@ export type EnvConfig = {
     mongoUrl: string;
     jwtSecret: string;
     devAuthPassword: string;
+    isDevEnv: boolean;
 };
 
 export const envConfig: EnvConfig = {
@@ -20,4 +21,5 @@ export const envConfig: EnvConfig = {
     mongoUrl: process.env.MONGO_URL,
     jwtSecret: process.env.JWT_SECRET,
     devAuthPassword: process.env.DEV_AUTH_PASSWORD,
+    isDevEnv: process.env.IS_DEV_ENV === 'true',
 };

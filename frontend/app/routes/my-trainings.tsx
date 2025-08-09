@@ -108,19 +108,19 @@ export default function MyTrainings() {
     const runningDistance = activities
         .filter((a) => a.type === 'running')
         .reduce((sum, a) => sum + a.distance, 0);
-    const otherDistance = activities
-        .filter((a) => a.type === 'other')
+    const walkingDistance = activities
+        .filter((a) => a.type === 'walking')
         .reduce((sum, a) => sum + a.distance, 0);
 
     const getActivityIcon = (type: string) =>
-        type === 'running' ? '🏃‍♂️' : type === 'cycling' ? '🚴‍♂️' : '⭐';
+        type === 'running' ? '🏃‍♂️' : type === 'cycling' ? '🚴‍♂️' : '🚶‍♂️';
 
     const getActivityColor = (type: string) =>
         type === 'running'
             ? 'bg-green-100 text-green-800'
             : type === 'cycling'
               ? 'bg-blue-100 text-blue-800'
-              : 'bg-purple-100 text-purple-800';
+              : 'bg-yellow-100 text-yellow-800';
 
     const formatDuration = (minutes: number) => {
         const hours = Math.floor(minutes / 60);
@@ -136,10 +136,10 @@ export default function MyTrainings() {
             // Map frontend activity format to backend training format
             const trainingData = {
                 userId: user.id,
-                title: `${newActivity.type.charAt(0).toUpperCase() + newActivity.type.slice(1)} Activity`,
                 description: newActivity.notes || '',
                 distance: newActivity.distance,
                 date: newActivity.date,
+                activityType: newActivity.type,
             };
 
             await trainingApi.create(trainingData);
@@ -168,6 +168,16 @@ export default function MyTrainings() {
         setNewActivity((prev) => ({ ...prev, [field]: value }));
     };
 
+    const handleDelete = async (activityId: string) => {
+        try {
+            await trainingApi.delete(activityId);
+            setActivities((prev) => prev.filter((a) => a.id !== activityId));
+        } catch (err) {
+            console.error('Failed to delete activity:', err);
+            setError('Failed to delete activity. Please try again.');
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -186,7 +196,7 @@ export default function MyTrainings() {
                     <p className="text-red-600 mb-4">{error}</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="px-4 py-2 bg-[#0161D5] text-white rounded-lg hover:bg-[#0152b5]"
                     >
                         Retry
                     </button>
@@ -201,14 +211,14 @@ export default function MyTrainings() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8 flex-shrink-0">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">My Activities</h1>
+                        <h1 className="text-3xl font-bold text-gray-900">My activities</h1>
                         <p className="mt-2 text-gray-600">
                             Track your fitness journey and see your progress over time.
                         </p>
                     </div>
                     <button
                         onClick={() => setShowAddForm(!showAddForm)}
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="inline-flex items-center px-4 py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                     >
                         <span className="mr-2">+</span>
                         {showAddForm ? 'Cancel' : 'Add Activity'}
@@ -263,13 +273,13 @@ export default function MyTrainings() {
 
                     <div className="bg-white rounded-lg shadow p-6">
                         <div className="flex items-center">
-                            <div className="p-2 bg-purple-100 rounded-lg">
-                                <span className="text-2xl">⭐</span>
+                            <div className="p-2 bg-yellow-100 rounded-lg">
+                                <span className="text-2xl">🚶‍♂️</span>
                             </div>
                             <div className="ml-4">
-                                <h3 className="text-sm font-medium text-gray-500">Other</h3>
+                                <h3 className="text-sm font-medium text-gray-500">Walking</h3>
                                 <p className="text-2xl font-bold text-gray-900">
-                                    {otherDistance.toFixed(1)} km
+                                    {walkingDistance.toFixed(1)} km
                                 </p>
                             </div>
                         </div>
@@ -289,11 +299,11 @@ export default function MyTrainings() {
                                     <select
                                         value={newActivity.type}
                                         onChange={(e) => handleInputChange('type', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0161D5] focus:border-transparent"
                                     >
                                         <option value="running">Running</option>
                                         <option value="cycling">Cycling</option>
-                                        <option value="other">Other</option>
+                                        <option value="walking">Walking</option>
                                     </select>
                                 </div>
 
@@ -312,7 +322,7 @@ export default function MyTrainings() {
                                                 parseFloat(e.target.value) || 0,
                                             )
                                         }
-                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0161D5] focus:border-transparent"
                                         placeholder="0.0"
                                         required
                                     />
@@ -326,7 +336,7 @@ export default function MyTrainings() {
                                         type="date"
                                         value={newActivity.date}
                                         onChange={(e) => handleInputChange('date', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0161D5] focus:border-transparent"
                                         required
                                     />
                                 </div>
@@ -340,7 +350,7 @@ export default function MyTrainings() {
                                     value={newActivity.notes || ''}
                                     onChange={(e) => handleInputChange('notes', e.target.value)}
                                     rows={3}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0161D5] focus:border-transparent"
                                     placeholder="Add any notes about your activity..."
                                 />
                             </div>
@@ -349,13 +359,13 @@ export default function MyTrainings() {
                                 <button
                                     type="button"
                                     onClick={() => setShowAddForm(false)}
-                                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    className="px-4 py-2 bg-[#0161D5] border border-transparent rounded-md text-sm font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                                 >
                                     Add Activity
                                 </button>
@@ -365,14 +375,14 @@ export default function MyTrainings() {
                 )}
 
                 {/* Activities List */}
-                <div className="bg-white rounded-lg shadow flex-1 flex flex-col min-h-0">
-                    <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
+                <div className="bg-white rounded-lg shadow">
+                    <div className="px-6 py-4 border-b border-gray-200">
                         <h3 className="text-lg font-medium text-gray-900">Recent Activities</h3>
                     </div>
 
                     {activities.length === 0 ? (
-                        <div className="px-6 py-12 text-center flex-1 flex flex-col justify-center">
-                            <span className="text-6xl mb-4 block">🏃‍♂️</span>
+                        <div className="px-6 py-12 text-center">
+                            <span className="text-6xl mb-4 block">🚶‍♂️</span>
                             <h3 className="text-lg font-medium text-gray-900 mb-2">
                                 No activities yet
                             </h3>
@@ -383,11 +393,11 @@ export default function MyTrainings() {
                                 onClick={() => setShowAddForm(true)}
                                 className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700"
                             >
-                                Add Your First Activity
+                                + Add Activity
                             </button>
                         </div>
                     ) : (
-                        <div className="flex-1 overflow-y-auto scrollbar-custom">
+                        <div className="max-h-[500px] overflow-y-auto scrollbar-custom">
                             <div className="divide-y divide-gray-200">
                                 {activities.map((activity) => (
                                     <div key={activity.id} className="px-6 py-4 hover:bg-gray-50">
@@ -419,10 +429,29 @@ export default function MyTrainings() {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="text-right">
+                                            <div className="flex items-center space-x-4">
                                                 <p className="font-medium text-gray-900">
                                                     {activity.distance} km
                                                 </p>
+                                                <button
+                                                    onClick={() => handleDelete(activity.id)}
+                                                    title="Delete"
+                                                    aria-label="Delete activity"
+                                                    className="p-2 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24"
+                                                        fill="currentColor"
+                                                        className="h-5 w-5"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M9 3.75A.75.75 0 019.75 3h4.5a.75.75 0 01.75.75V6h3.75a.75.75 0 010 1.5h-.548l-1.178 12.074A3 3 0 0114.305 22.5H9.695a3 3 0 01-2.969-2.926L5.548 7.5H5a.75.75 0 010-1.5H8.75V3.75zM9 7.5h6l1.125 11.543a1.5 1.5 0 01-1.491 1.457H9.366a1.5 1.5 0 01-1.49-1.457L9 7.5zm2.25 3.75a.75.75 0 00-1.5 0v6a.75.75 0 001.5 0v-6zm4.5 0a.75.75 0 00-1.5 0v6a.75.75 0 001.5 0v-6z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

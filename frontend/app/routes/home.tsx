@@ -1,9 +1,9 @@
-import { Link } from 'react-router'
+import { Link } from 'react-router';
 
 export default function Home() {
     return (
         <div className="page">
-            <h1>Welcome to Trainings Registry</h1>
+            <h1>Welcome to Move for Ukraine</h1>
             <p>
                 Discover and manage professional training courses and certifications. Our
                 comprehensive registry helps you find the right training programs to advance your
@@ -22,5 +22,5 @@ export default function Home() {
                 Browse Trainings
             </Link>
         </div>
-    )
+    );
 }

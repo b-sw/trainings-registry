@@ -1,12 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ActivityType } from './training.entity';
 
 export class TrainingNormalized {
     id: string;
     userId: string;
-    title: string;
     description: string;
     date: Date;
     distance: number;
+    activityType: ActivityType;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -19,9 +20,6 @@ export class TrainingSerialized {
     userId: string;
 
     @ApiProperty()
-    title: string;
-
-    @ApiProperty()
     description: string;
 
     @ApiProperty()
@@ -29,6 +27,9 @@ export class TrainingSerialized {
 
     @ApiProperty()
     distance: number;
+
+    @ApiProperty({ enum: ActivityType })
+    activityType: ActivityType;
 
     @ApiProperty()
     createdAt: Date;

@@ -6,10 +6,10 @@ export class TrainingSerializer {
         return {
             id: entity._id.toString(),
             userId: entity.userId,
-            title: entity.title,
             description: entity.description,
             date: entity.date,
             distance: entity.distance,
+            activityType: entity.activityType,
             createdAt: entity.createdAt,
             updatedAt: entity.updatedAt,
         };
@@ -23,10 +23,10 @@ export class TrainingSerializer {
         return {
             id: normalized.id,
             userId: normalized.userId,
-            title: normalized.title,
             description: normalized.description,
             date: normalized.date,
             distance: normalized.distance,
+            activityType: normalized.activityType,
             createdAt: normalized.createdAt,
             updatedAt: normalized.updatedAt,
         };

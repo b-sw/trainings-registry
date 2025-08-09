@@ -1,6 +1,12 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
+import { envConfig } from 'src/shared/env.config';
 import { Role } from '../users/entities/user.entity';
 import { UserNormalized } from '../users/entities/user.interface';
 import { UsersReadService } from '../users/read/users-read.service';
@@ -65,9 +71,15 @@ export class AuthService {
     }
 
     private requireValidEmail(email: string): void {
-        // Basic email validation - customize as needed
         if (!email || !email.includes('@')) {
             throw new BadRequestException(AuthService.USER_INVALID_MESSAGE);
+        }
+
+        if (!envConfig.isDevEnv) {
+            const domain = email.split('@')[1]?.toLowerCase();
+            if (domain !== 'box.com') {
+                throw new UnauthorizedException('Only @box.com emails are allowed');
+            }
         }
     }
 

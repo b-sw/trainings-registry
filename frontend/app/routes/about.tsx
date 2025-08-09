@@ -2,56 +2,79 @@ export default function About() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold text-gray-900">About Trainings Registry</h1>
+                <h1 className="text-3xl font-bold text-gray-900">About Move for Ukraine 2025</h1>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
-                <p className="text-gray-600">
-                    Trainings Registry is a comprehensive platform designed to help professionals
-                    and organizations discover, manage, and track training courses and
-                    certifications.
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6 text-sm">
+                <p className="text-gray-700">
+                    The war in Ukraine is not over. Every day, Ukrainians — both defenders and
+                    civilians — continue to suffer. Many are injured, displaced, and living through
+                    the unimaginable. Among them are thousands who have lost limbs and are now
+                    beginning the long journey of physical and emotional recovery.
+                </p>
+
+                <p className="text-gray-700">
+                    <strong>Move for Ukraine 2025</strong> is our collective response — a two-week
+                    movement to show solidarity, raise awareness, and generate life-changing
+                    support. From August 12 to 26, every kilometer walked, run, or moved will help
+                    fund critical rehabilitation for those affected by the war.
+                </p>
+
+                <p className="text-gray-700">
+                    Last year, our community came together across countries and time zones, moving
+                    thousands of kilometers and raising meaningful support. This year, we’re back —
+                    stronger and more determined.
                 </p>
 
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-3">Our Mission</h2>
-                    <p className="text-gray-600">
-                        We believe that continuous learning is essential for professional growth.
-                        Our mission is to make it easier for individuals and organizations to find,
-                        access, and manage high-quality training programs.
+                    <h2 className="text-xl font-semibold text-gray-900 mb-3">How it works</h2>
+                    <p className="text-gray-700 mb-2">
+                        For every kilometer logged during the campaign, Box.org will donate to
+                        Superhumans — a Ukrainian nonprofit building a world-class center for
+                        physical and psychological rehabilitation. Superhumans provides:
+                    </p>
+                    <ul className="list-disc pl-6 text-gray-700 space-y-1">
+                        <li>Advanced prosthetics</li>
+                        <li>Reconstructive surgery</li>
+                        <li>Mental health support</li>
+                        <li>Long-term care for war victims and veterans</li>
+                    </ul>
+                    <p className="text-gray-700 mt-2">
+                        Their mission is simple yet profound: help Ukrainians not just survive — but
+                        thrive again.
                     </p>
                 </div>
 
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-3">What We Offer</h2>
-                    <p className="text-gray-600">
-                        Our platform provides a centralized registry of training courses across
-                        various industries and skill areas. Whether you're looking to enhance your
-                        technical skills, develop leadership capabilities, or earn industry
-                        certifications, we've got you covered.
+                    <h2 className="text-xl font-semibold text-gray-900 mb-3">Be a part of it</h2>
+                    <p className="text-gray-700 mb-2">
+                        This year, we’re recognizing top contributors in three categories:
+                    </p>
+                    <ul className="list-disc pl-6 text-gray-700 space-y-1">
+                        <li>🏃 Running</li>
+                        <li>🚴 Cycling</li>
+                        <li>🚶 Walking and moving</li>
+                    </ul>
+                    <p className="text-gray-700 mt-2">
+                        We'll celebrate 3 winners and 9 top contributors — but every single step
+                        matters. Whether it’s a daily walk or a weekend bike ride, your movement can
+                        fuel someone else’s healing.
                     </p>
                 </div>
 
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-3">Technology</h2>
-                    <p className="text-gray-600">
-                        This application is built with modern web technologies including React,
-                        TypeScript, React Router, and Vite with Server-Side Rendering for optimal
-                        performance and SEO.
-                    </p>
-                </div>
-
-                <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-3">Typography</h2>
-                    <p className="text-gray-600">
-                        We use <strong>Kumbh Sans</strong> for beautiful, readable text and{' '}
-                        <code className="font-mono bg-gray-100 px-2 py-1 rounded text-sm">
-                            JetBrains Mono
-                        </code>{' '}
-                        for code snippets and technical content. These fonts provide excellent
-                        readability and a modern, professional appearance.
+                    <h2 className="text-xl font-semibold text-gray-900 mb-3">Why we move</h2>
+                    <ul className="list-disc pl-6 text-gray-700 space-y-1">
+                        <li>Because the war is still real.</li>
+                        <li>Because healing takes more than time — it takes action.</li>
+                        <li>Because hope is built together.</li>
+                    </ul>
+                    <p className="text-gray-700 mt-4">
+                        Let’s turn our everyday movement into momentum for recovery. Let’s help
+                        rebuild lives, step by step!
                     </p>
                 </div>
             </div>
         </div>
-    )
+    );
 }

@@ -85,7 +85,7 @@ export class TrainingsController {
     }
 
     @Delete('trainings/:trainingId')
-    @UseGuards(JwtGuard, AdminGuard)
+    @UseGuards(JwtGuard, SelfGuard)
     @ApiOperation({ summary: 'Delete a training' })
     async delete(@Param('trainingId') trainingId: string): Promise<TrainingSerialized> {
         const training = await this.trainingsWriteService.deleteById(trainingId);
@@ -199,7 +199,14 @@ export class TrainingsController {
             {} as Record<string, { userId: string; totalDistance: number; totalTrainings: number }>,
         );
 
-        return Object.values(userActivities);
+        const list = Object.values(userActivities);
+
+        // Apply pagination
+        const skipNum = dto.skip ?? 0;
+        const limitNum = dto.limit ?? list.length;
+        const paged = list.slice(skipNum, skipNum + limitNum);
+
+        return paged;
     }
 
     @Post('teams/activities')

@@ -5,10 +5,10 @@ import { config } from '../config/env';
 export interface TrainingSerialized {
     id: string;
     userId: string;
-    title: string;
     description: string;
     date: Date;
     distance: number;
+    activityType: 'cycling' | 'running' | 'walking';
     createdAt: Date;
     updatedAt: Date;
 }
@@ -44,7 +44,7 @@ export interface TeamActivity {
 // Frontend interfaces (mapping from backend)
 export interface Activity {
     id: string;
-    type: 'cycling' | 'running' | 'other';
+    type: 'cycling' | 'running' | 'walking';
     distance: number;
     duration: number; // estimated from distance
     date: string;
@@ -161,10 +161,10 @@ export const trainingApi = {
     // Create training
     create: async (training: {
         userId: string;
-        title: string;
-        description: string;
+        description?: string;
         distance: number;
         date: string;
+        activityType: 'cycling' | 'running' | 'walking';
     }): Promise<TrainingSerialized> => {
         const response = await apiClient.post('/trainings', training);
         return response.data;
@@ -174,10 +174,10 @@ export const trainingApi = {
     update: async (
         trainingId: string,
         training: Partial<{
-            title: string;
             description: string;
             distance: number;
             date: string;
+            activityType: 'cycling' | 'running' | 'walking';
         }>,
     ): Promise<TrainingSerialized> => {
         const response = await apiClient.put(`/trainings/${trainingId}`, training);
@@ -258,28 +258,16 @@ export const publicApi = {
 
 // Helper functions to map backend data to frontend format
 export const mapTrainingToActivity = (training: TrainingSerialized): Activity => {
-    // Determine activity type from title/description (simple heuristic)
-    const title = training.title.toLowerCase();
-    const description = training.description.toLowerCase();
-
-    let type: 'cycling' | 'running' | 'other' = 'other';
-    if (title.includes('run') || description.includes('run') || title.includes('jog')) {
-        type = 'running';
-    } else if (title.includes('cycl') || description.includes('bike') || title.includes('cycl')) {
-        type = 'cycling';
-    }
+    const type: 'cycling' | 'running' | 'walking' = training.activityType;
 
     // Estimate duration based on distance and activity type (rough estimates)
     let estimatedDuration = 0;
     if (type === 'running') {
-        // Assume 6 minutes per km for running
         estimatedDuration = Math.round(training.distance * 6);
     } else if (type === 'cycling') {
-        // Assume 2.5 minutes per km for cycling
         estimatedDuration = Math.round(training.distance * 2.5);
     } else {
-        // Default estimate for other activities
-        estimatedDuration = Math.round(training.distance * 4);
+        estimatedDuration = Math.round(training.distance * 10);
     }
 
     return {

@@ -84,7 +84,7 @@ export function Landing() {
                     {/* Middle right - Fit-content Login button */}
                     <div className="row-start-2 justify-self-center sm:justify-self-end text-center sm:text-right">
                         <div className="inline-block w-auto">
-                            <GoogleLoginButton className="!w-auto !bg-blue-600 hover:!bg-blue-700 !text-white !font-bold !py-12 !px-12 !rounded-full !border-0 !shadow-lg hover:!shadow-xl">
+                            <GoogleLoginButton className="!w-auto !bg-[#0161D5] hover:!bg-[#0152b5] !text-white !font-bold !py-12 !px-12 !rounded-full !border-0 !shadow-lg hover:!shadow-xl">
                                 TRACK YOUR MOVEMENT
                             </GoogleLoginButton>
                         </div>
@@ -107,10 +107,10 @@ export function Landing() {
                 <div className="text-right" style={{ fontSize: 'clamp(16px, 2.5vw, 36px)' }}>
                     <p className="font-semibold text-black leading-tight inline-block text-left">
                         Share your achievements at{' '}
-                        <span className="text-blue-600 font-bold">#move-for-ukraine</span>
+                        <span className="text-[#0161D5] font-bold">#move-for-ukraine</span>
                         <br />
                         As of {today}, we've moved for{' '}
-                        <span className="text-blue-600 font-bold">
+                        <span className="text-[#0161D5] font-bold">
                             {totalKilometers !== null ? `${totalKilometers}km` : '...'}
                         </span>
                     </p>

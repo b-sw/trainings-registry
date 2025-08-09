@@ -7,7 +7,7 @@
     --font-mono:
         'JetBrains Mono', 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Source Code Pro',
         monospace;
-    --color-primary-500: #3b82f6;
+    --color-primary-500: #0161d5;
 }
 
 /* Typography */
@@ -33,7 +33,7 @@ body {
 }
 
 #root * {
-    @apply outline-blue-500;
+    @apply outline-[#0161D5];
 }
 
 /* Page and button styles for original components */
@@ -42,16 +42,16 @@ body {
 }
 
 .btn {
-    @apply inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-center no-underline;
+    @apply inline-block px-6 py-3 bg-[#0161D5] text-white rounded-lg hover:bg-[#0152b5] transition-colors duration-200 font-medium text-center no-underline;
 }
 
 /* Custom Components */
 .sidebar-item {
-    @apply flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-lg transition-colors duration-200 cursor-pointer;
+    @apply flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-[#0161D5] rounded-lg transition-colors duration-200 cursor-pointer;
 }
 
 .sidebar-item.active {
-    @apply bg-blue-50 text-blue-600 font-medium;
+    @apply bg-blue-50 text-[#0161D5] font-medium;
 }
 
 .sidebar-item:hover {
@@ -92,12 +92,12 @@ body {
 input:focus,
 select:focus,
 textarea:focus {
-    @apply ring-2 ring-blue-500 border-blue-300;
+    @apply ring-2 ring-[#0161D5] border-blue-300;
 }
 
 /* Button styles */
 .btn-primary {
-    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium;
+    @apply px-4 py-2 bg-[#0161D5] text-white rounded-lg hover:bg-[#0152b5] transition-colors duration-200 font-medium;
 }
 
 .btn-secondary {

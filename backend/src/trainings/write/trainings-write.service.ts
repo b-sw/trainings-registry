@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, UpdateQuery } from 'mongoose';
 import { TrainingEntity } from '../entities/training.entity';
@@ -15,12 +15,18 @@ export class TrainingsWriteService {
     ) {}
 
     async create(dto: CreateTrainingDto): Promise<TrainingNormalized> {
+        const trainingDate = new Date(dto.date);
+        const now = new Date();
+        if (trainingDate.getTime() > now.getTime()) {
+            throw new BadRequestException('Training date cannot be in the future');
+        }
+
         const entity = await this.trainingModel.create({
             userId: dto.userId,
-            title: dto.title,
             description: dto.description,
-            date: dto.date,
+            date: trainingDate,
             distance: dto.distance,
+            activityType: dto.activityType,
         });
 
         return TrainingSerializer.normalize(entity);
@@ -29,20 +35,25 @@ export class TrainingsWriteService {
     public async update(trainingId: string, dto: UpdateTrainingDto): Promise<TrainingNormalized> {
         const updateQuery: UpdateQuery<TrainingEntity> = {};
 
-        if (dto.title) {
-            updateQuery.title = dto.title;
-        }
-
         if (dto.description) {
             updateQuery.description = dto.description;
         }
 
         if (dto.date) {
-            updateQuery.date = dto.date;
+            const trainingDate = new Date(dto.date);
+            const now = new Date();
+            if (trainingDate.getTime() > now.getTime()) {
+                throw new BadRequestException('Training date cannot be in the future');
+            }
+            updateQuery.date = trainingDate as any;
         }
 
         if (dto.distance) {
-            updateQuery.distance = dto.distance;
+            updateQuery.distance = dto.distance as any;
+        }
+
+        if (dto.activityType) {
+            updateQuery.activityType = dto.activityType as any;
         }
 
         const entity = await this.trainingModel.findByIdAndUpdate(trainingId, updateQuery, {
