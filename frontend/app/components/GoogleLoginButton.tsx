@@ -37,7 +37,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
     return (
         <div
             className="w-full flex flex-col items-start"
-            style={{ fontSize: 'clamp(12px, 5vw, 64px)' }}
+            style={{ fontSize: 'clamp(12px, 3vw, 56px)' }}
         >
             <button
                 onClick={() => googleLogin()}
@@ -47,7 +47,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
                     bg-white text-gray-700 font-semibold rounded-lg shadow-lg 
                     hover:shadow-xl transform hover:scale-105 transition-all duration-200
                     disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
-                    border border-gray-300 hover:border-gray-400
+                    border border-gray-300 hover:border-gray-400 cursor-pointer
                     ${className}
                 `}
             >
