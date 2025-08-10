@@ -213,17 +213,19 @@ export default function MyTrainings() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8 flex-shrink-0">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">My activities</h1>
+                        <h1 className="text-3xl font-oswald font-bold text-gray-900">
+                            MY ACTIVITIES
+                        </h1>
                         <p className="mt-2 text-gray-600">
                             Track your fitness journey and see your progress over time.
                         </p>
                     </div>
                     <button
                         onClick={() => setShowAddForm(!showAddForm)}
-                        className="inline-flex items-center px-4 py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                        className="font-oswald inline-flex items-center px-4 py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                     >
                         <span className="mr-2">+</span>
-                        {showAddForm ? 'Cancel' : 'Add Activity'}
+                        {showAddForm ? 'CANCEL' : 'ADD ACTIVITY'}
                     </button>
                 </div>
 
@@ -238,8 +240,8 @@ export default function MyTrainings() {
                                 <h3 className="text-sm font-medium text-gray-500">
                                     Total Distance
                                 </h3>
-                                <p className="text-2xl font-bold text-gray-900">
-                                    {totalDistance.toFixed(1)} km
+                                <p className="text-2xl font-oswald font-bold text-gray-900">
+                                    {totalDistance.toFixed(1)} KM
                                 </p>
                             </div>
                         </div>
@@ -252,8 +254,8 @@ export default function MyTrainings() {
                             </div>
                             <div className="ml-4">
                                 <h3 className="text-sm font-medium text-gray-500">Running</h3>
-                                <p className="text-2xl font-bold text-gray-900">
-                                    {runningDistance.toFixed(1)} km
+                                <p className="text-2xl font-oswald font-bold text-gray-900">
+                                    {runningDistance.toFixed(1)} KM
                                 </p>
                             </div>
                         </div>
@@ -266,8 +268,8 @@ export default function MyTrainings() {
                             </div>
                             <div className="ml-4">
                                 <h3 className="text-sm font-medium text-gray-500">Cycling</h3>
-                                <p className="text-2xl font-bold text-gray-900">
-                                    {cyclingDistance.toFixed(1)} km
+                                <p className="text-2xl font-oswald font-bold text-gray-900">
+                                    {cyclingDistance.toFixed(1)} KM
                                 </p>
                             </div>
                         </div>
@@ -280,8 +282,8 @@ export default function MyTrainings() {
                             </div>
                             <div className="ml-4">
                                 <h3 className="text-sm font-medium text-gray-500">Walking</h3>
-                                <p className="text-2xl font-bold text-gray-900">
-                                    {walkingDistance.toFixed(1)} km
+                                <p className="text-2xl font-oswald font-bold text-gray-900">
+                                    {walkingDistance.toFixed(1)} KM
                                 </p>
                             </div>
                         </div>
@@ -361,15 +363,15 @@ export default function MyTrainings() {
                                 <button
                                     type="button"
                                     onClick={() => setShowAddForm(false)}
-                                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                                    className="font-oswald px-4 py-2 border border-gray-300 rounded-md text-md font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                                 >
-                                    Cancel
+                                    CANCEL
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-[#0161D5] border border-transparent rounded-md text-sm font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                                    className="font-oswald px-4 py-2 bg-[#0161D5] border border-transparent rounded-md text-md font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                                 >
-                                    Add Activity
+                                    ADD ACTIVITY
                                 </button>
                             </div>
                         </form>
@@ -382,7 +384,7 @@ export default function MyTrainings() {
                         <h3 className="text-lg font-medium text-gray-900">Recent Activities</h3>
                     </div>
 
-                    {activities.length === 0 ? (
+                    {activities.length === 0 && !showAddForm ? (
                         <div className="px-6 py-12 text-center">
                             <span className="text-6xl mb-4 block">🚶‍♂️</span>
                             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -393,9 +395,9 @@ export default function MyTrainings() {
                             </p>
                             <button
                                 onClick={() => setShowAddForm(true)}
-                                className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700"
+                                className="font-oswald inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-lg font-medium text-white hover:bg-blue-700"
                             >
-                                + Add Activity
+                                + ADD YOUR FIRST ACTIVITY
                             </button>
                         </div>
                     ) : (

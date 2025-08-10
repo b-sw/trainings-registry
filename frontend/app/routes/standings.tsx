@@ -162,17 +162,19 @@ export default function Standings() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Top performers</h1>
+                        <h1 className="text-3xl font-oswald font-bold text-gray-900">
+                            TOP PERFORMERS
+                        </h1>
                         <p className="mt-2 text-gray-600">
                             See how you rank against other team members in various activities.
                         </p>
                     </div>
                     <button
                         onClick={() => (window.location.href = '/my-trainings?add=true')}
-                        className="inline-flex items-center px-4 py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                        className="font-oswald inline-flex items-center px-4 py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                     >
                         <span className="mr-2">+</span>
-                        Add Activity
+                        ADD ACTIVITY
                     </button>
                 </div>
 
@@ -183,7 +185,7 @@ export default function Standings() {
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🏆 Overall Rank
                             </h3>
-                            <div className="text-2xl font-bold text-[#0161D5]">
+                            <div className="text-2xl font-oswald font-bold text-[#0161D5]">
                                 #{currentUserData.rank}
                             </div>
                             <p className="text-gray-600 text-sm">
@@ -194,7 +196,7 @@ export default function Standings() {
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🚴‍♂️ Cycling Rank
                             </h3>
-                            <div className="text-2xl font-bold text-[#0161D5]">
+                            <div className="text-2xl font-oswald font-bold text-[#0161D5]">
                                 #
                                 {getRankingByCategory('cycling').findIndex(
                                     (user) => user.isCurrentUser,
@@ -208,7 +210,7 @@ export default function Standings() {
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🏃‍♂️ Running Rank
                             </h3>
-                            <div className="text-2xl font-bold text-green-600">
+                            <div className="text-2xl font-oswald font-bold text-green-600">
                                 #
                                 {getRankingByCategory('running').findIndex(
                                     (user) => user.isCurrentUser,
@@ -222,7 +224,7 @@ export default function Standings() {
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🚶‍♂️ Walking Rank
                             </h3>
-                            <div className="text-2xl font-bold text-yellow-600">
+                            <div className="text-2xl font-oswald font-bold text-yellow-600">
                                 #
                                 {getRankingByCategory('walking').findIndex(
                                     (user) => user.isCurrentUser,
@@ -345,11 +347,11 @@ export default function Standings() {
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-2xl font-bold text-gray-900">
-                                                {getDistanceForTab(user, activeTab).toFixed(1)} km
+                                            <div className="text-2xl font-oswald font-bold text-gray-900">
+                                                {getDistanceForTab(user, activeTab).toFixed(1)} KM
                                             </div>
                                             {activeTab === 'all' && (
-                                                <div className="text-sm text-gray-500 mt-1">
+                                                <div className="text-sm font-oswald text-gray-500 mt-1">
                                                     🚴‍♂️ {user.cyclingDistance.toFixed(1)} • 🏃‍♂️{' '}
                                                     {user.runningDistance.toFixed(1)} • 🚶‍♂️{' '}
                                                     {user.walkingDistance.toFixed(1)}
