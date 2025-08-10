@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import type { Activity } from '../utils/api';
 import { mapTrainingToActivity, trainingApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
@@ -9,7 +10,8 @@ export default function MyTrainings() {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [showAddForm, setShowAddForm] = useState(false);
+    const [searchParams] = useSearchParams();
+    const [showAddForm, setShowAddForm] = useState(() => searchParams.get('add') === 'true');
     const [hasMore, setHasMore] = useState(true);
     const [skip, setSkip] = useState(0);
     const limit = 20;
