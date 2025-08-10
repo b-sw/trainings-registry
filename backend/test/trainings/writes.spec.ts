@@ -1,3 +1,4 @@
+import MockDate from 'mockdate';
 import * as request from 'supertest';
 import { ActivityType } from '../../src/trainings/entities/training.entity';
 import { createTestApp } from '../utils/bootstrap';
@@ -7,6 +8,7 @@ describe('TrainingsController (writes)', () => {
 
     beforeAll(async () => {
         bootstrap = await createTestApp();
+        MockDate.set('2025-08-12T05:00:00.000Z');
     });
 
     beforeEach(async () => {
