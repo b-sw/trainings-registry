@@ -50,9 +50,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const userData = response.data;
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('❌ Auth: Login failed:', error);
-            throw new Error('Authentication failed');
+            // Extract backend message if available
+            let message = 'Authentication failed';
+            if (axios.isAxiosError(error)) {
+                const data = error.response?.data as any;
+                message =
+                    (typeof data === 'string' && data) ||
+                    data?.message ||
+                    data?.error ||
+                    data?.detail ||
+                    error.message ||
+                    message;
+            } else if (error instanceof Error && error.message) {
+                message = error.message;
+            }
+            throw new Error(message);
         } finally {
             setLoading(false);
         }

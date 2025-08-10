@@ -1,3 +1,4 @@
+import { Logger, Metrics } from '@logdash/js-sdk';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, UpdateQuery } from 'mongoose';
@@ -12,6 +13,8 @@ export class UsersWriteService {
     constructor(
         @InjectModel(UserEntity.name)
         private readonly userModel: Model<UserEntity>,
+        private readonly logger: Logger,
+        private readonly metrics: Metrics,
     ) {}
 
     async create(dto: CreateUserDto): Promise<UserNormalized> {
@@ -28,7 +31,12 @@ export class UsersWriteService {
             imageUrl: dto.imageUrl,
         });
 
-        return UserSerializer.normalize(entity);
+        const normalized = UserSerializer.normalize(entity);
+
+        this.logger.info('User created', { id: normalized.id, email: normalized.email });
+        this.metrics.mutate('usersCount', 1);
+
+        return normalized;
     }
 
     public async update(userId: string, dto: UpdateUserDto): Promise<UserNormalized> {

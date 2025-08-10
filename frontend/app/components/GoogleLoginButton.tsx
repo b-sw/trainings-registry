@@ -1,5 +1,6 @@
 import { useGoogleLogin } from '@react-oauth/google';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../utils/auth';
 
 interface GoogleLoginButtonProps {
@@ -13,24 +14,23 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
 }) => {
     const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     const googleLogin = useGoogleLogin({
         onSuccess: async (codeResponse) => {
             setIsLoading(true);
-            setError(null);
             try {
                 await login(codeResponse.access_token);
             } catch (err) {
                 console.error('Login failed:', err);
-                setError(err instanceof Error ? err.message : 'Login failed');
+                const message = err instanceof Error ? err.message : 'Login failed';
+                toast.error(message);
             } finally {
                 setIsLoading(false);
             }
         },
         onError: (error) => {
             console.error('Google login error:', error);
-            setError('Google authentication failed');
+            toast.error('Google authentication failed');
         },
     });
 
@@ -89,7 +89,6 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
                     </div>
                 )}
             </button>
-            {error && <p className="text-red-500 text-sm mt-2 text-center max-w-xs">{error}</p>}
         </div>
     );
 };

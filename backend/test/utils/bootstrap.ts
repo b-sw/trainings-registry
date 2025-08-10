@@ -1,3 +1,4 @@
+import { Logger, Metrics } from '@logdash/js-sdk';
 import { Injectable, ValidationPipe } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
@@ -6,6 +7,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtGuard } from '../../src/auth/guards/jwt.guard';
+import { LogdashModule } from '../../src/logger/logger.module';
 import { TrainingEntity, TrainingSchema } from '../../src/trainings/entities/training.entity';
 import { TrainingsReadModule } from '../../src/trainings/read/trainings-read.module';
 import { TrainingsController } from '../../src/trainings/trainings.controller';
@@ -46,7 +48,7 @@ class TestJwtStrategy extends PassportStrategy(Strategy) {
 }
 
 export async function createTestApp() {
-    const module: TestingModule = await Test.createTestingModule({
+    const moduleBuilder = Test.createTestingModule({
         imports: [
             rootMongooseTestModule(),
             PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -63,10 +65,19 @@ export async function createTestApp() {
             TrainingsReadModule,
             TrainingsWriteModule,
             GuardsModule,
+            LogdashModule,
         ],
         controllers: [UsersController, TrainingsController],
         providers: [TestJwtStrategy, JwtGuard],
-    }).compile();
+    });
+
+    // Override Logdash providers with no-ops for tests
+    moduleBuilder.overrideProvider(Logger).useValue(new Logger(() => {}));
+    moduleBuilder
+        .overrideProvider(Metrics)
+        .useValue({ set: () => {}, mutate: () => {} } as unknown as Metrics);
+
+    const module: TestingModule = await moduleBuilder.compile();
 
     const app = module.createNestApplication();
     app.useGlobalPipes(

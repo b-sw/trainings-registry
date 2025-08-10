@@ -1,3 +1,4 @@
+import { Logger, Metrics } from '@logdash/js-sdk';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, UpdateQuery } from 'mongoose';
@@ -13,6 +14,8 @@ export class TrainingsWriteService {
     constructor(
         @InjectModel(TrainingEntity.name)
         private readonly trainingModel: Model<TrainingEntity>,
+        private readonly logger: Logger,
+        private readonly metrics: Metrics,
     ) {}
 
     async create(dto: CreateTrainingDto): Promise<TrainingNormalized> {
@@ -39,7 +42,18 @@ export class TrainingsWriteService {
             activityType: dto.activityType,
         });
 
-        return TrainingSerializer.normalize(entity);
+        const normalized = TrainingSerializer.normalize(entity);
+
+        // metrics and logging
+        this.metrics.mutate('activitiesCount', 1);
+        this.logger.info('Training created', {
+            id: normalized.id,
+            userId: normalized.userId,
+            distance: normalized.distance,
+            activityType: normalized.activityType,
+        });
+
+        return normalized;
     }
 
     public async update(trainingId: string, dto: UpdateTrainingDto): Promise<TrainingNormalized> {
@@ -84,7 +98,18 @@ export class TrainingsWriteService {
             throw new NotFoundException('Training not found');
         }
 
-        return TrainingSerializer.normalize(entity);
+        const normalized = TrainingSerializer.normalize(entity);
+
+        // metrics and logging
+        this.metrics.mutate('activitiesCount', -1);
+        this.logger.info('Training deleted', {
+            id: normalized.id,
+            userId: normalized.userId,
+            distance: normalized.distance,
+            activityType: normalized.activityType,
+        });
+
+        return normalized;
     }
 
     public async deleteByUserId(userId: string): Promise<void> {
