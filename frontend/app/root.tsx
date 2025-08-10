@@ -2,6 +2,7 @@ import React from 'react';
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Toaster } from 'react-hot-toast';
 import type { LinksFunction } from 'react-router';
 import { AuthWrapper } from './components/AuthWrapper';
 import { Sidebar } from './components/Sidebar';
@@ -71,6 +72,7 @@ export default function App() {
                             </main>
                         </div>
                     </div>
+                    <Toaster position="top-right" />
                 </AuthWrapper>
             </AuthProvider>
         </GoogleOAuthProvider>

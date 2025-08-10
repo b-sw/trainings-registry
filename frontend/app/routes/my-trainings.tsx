@@ -1,4 +1,6 @@
+import axios from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router';
 import type { Activity } from '../utils/api';
 import { mapTrainingToActivity, trainingApi } from '../utils/api';
@@ -162,6 +164,27 @@ export default function MyTrainings() {
             await loadActivities(0, false);
         } catch (err) {
             console.error('Failed to create activity:', err);
+
+            // Prefer toast for validation/Bad Request errors and keep the page intact
+            if (axios.isAxiosError(err)) {
+                const status = err.response?.status;
+                const data: any = err.response?.data;
+                const serverMessage =
+                    typeof data === 'string'
+                        ? data
+                        : data?.message || data?.error || data?.errors?.[0]?.message;
+
+                if (status === 400) {
+                    toast.error(serverMessage || 'Bad request. Please check your input.');
+                    return; // Do not set global error state for 400
+                }
+
+                if (serverMessage) {
+                    setError(serverMessage);
+                    return;
+                }
+            }
+
             setError('Failed to create activity. Please try again.');
         }
     };
