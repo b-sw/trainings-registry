@@ -23,6 +23,9 @@ import { UserUtils } from './user.utils';
 // Set up test environment variables
 process.env.DEV_AUTH_PASSWORD = 'test-dev-password';
 process.env.JWT_SECRET = 'test-jwt-secret-key';
+if (process.env.IS_DEV_ENV === undefined) {
+    process.env.IS_DEV_ENV = 'true';
+}
 
 export type JwtPayload = { sub: string; email: string };
 
