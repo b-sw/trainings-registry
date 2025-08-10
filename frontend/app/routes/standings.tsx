@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Tooltip } from '../components/Tooltip';
+import { config } from '../config/env';
 import type { UserSerialized } from '../utils/api';
 import { trainingApi, userApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
@@ -25,6 +27,7 @@ export default function Standings() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const isDevEnv = config.IS_DEV_ENV;
 
     // Load standings data
     useEffect(() => {
@@ -169,13 +172,26 @@ export default function Standings() {
                             See how you rank against other team members in various activities.
                         </p>
                     </div>
-                    <button
-                        onClick={() => (window.location.href = '/my-trainings?add=true')}
-                        className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
-                    >
-                        <span className="mr-2">+</span>
-                        ADD ACTIVITY
-                    </button>
+                    {isDevEnv ? (
+                        <button
+                            onClick={() => (window.location.href = '/my-trainings?add=true')}
+                            className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                        >
+                            <span className="mr-2">+</span>
+                            ADD ACTIVITY
+                        </button>
+                    ) : (
+                        <Tooltip label="The event has not started yet">
+                            <button
+                                onClick={() => undefined}
+                                disabled
+                                className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white opacity-50 cursor-not-allowed"
+                            >
+                                <span className="mr-2">+</span>
+                                ADD ACTIVITY
+                            </button>
+                        </Tooltip>
+                    )}
                 </div>
 
                 {/* User Summary Cards */}

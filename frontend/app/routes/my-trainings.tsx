@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router';
+import { Tooltip } from '../components/Tooltip';
+import { config } from '../config/env';
 import type { Activity } from '../utils/api';
 import { mapTrainingToActivity, trainingApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
@@ -26,6 +28,8 @@ export default function MyTrainings() {
         date: new Date().toISOString().split('T')[0],
         notes: '',
     });
+
+    const isDevEnv = config.IS_DEV_ENV;
 
     // Load activities with pagination
     const loadActivities = useCallback(
@@ -257,13 +261,26 @@ export default function MyTrainings() {
                             Track your fitness journey and see your progress over time.
                         </p>
                     </div>
-                    <button
-                        onClick={() => setShowAddForm(!showAddForm)}
-                        className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
-                    >
-                        <span className="mr-2">+</span>
-                        {showAddForm ? 'CANCEL' : 'ADD ACTIVITY'}
-                    </button>
+                    {isDevEnv ? (
+                        <button
+                            onClick={() => setShowAddForm(!showAddForm)}
+                            className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                        >
+                            <span className="mr-2">+</span>
+                            {showAddForm ? 'CANCEL' : 'ADD ACTIVITY'}
+                        </button>
+                    ) : (
+                        <Tooltip label="The event has not started yet">
+                            <button
+                                onClick={() => undefined}
+                                disabled
+                                className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white opacity-50 cursor-not-allowed"
+                            >
+                                <span className="mr-2">+</span>
+                                ADD ACTIVITY
+                            </button>
+                        </Tooltip>
+                    )}
                 </div>
 
                 {/* Stats Cards */}
