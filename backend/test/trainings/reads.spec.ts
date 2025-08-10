@@ -1,4 +1,5 @@
 import * as request from 'supertest';
+import { ActivityType } from '../../src/trainings/entities/training.entity';
 import { createTestApp } from '../utils/bootstrap';
 
 describe('TrainingsController (reads)', () => {
@@ -25,13 +26,13 @@ describe('TrainingsController (reads)', () => {
 
             await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
-                title: 'Training 1',
                 distance: 5.0,
+                activityType: ActivityType.Running,
             });
             await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
-                title: 'Training 2',
                 distance: 3.0,
+                activityType: ActivityType.Cycling,
             });
 
             // when
@@ -42,8 +43,6 @@ describe('TrainingsController (reads)', () => {
             // then
             expect(response.status).toBe(200);
             expect(response.body).toHaveLength(2);
-            expect(response.body.map((t: any) => t.title)).toContain('Training 1');
-            expect(response.body.map((t: any) => t.title)).toContain('Training 2');
         });
 
         it('returns 401 when not authenticated', async () => {
@@ -65,10 +64,12 @@ describe('TrainingsController (reads)', () => {
             await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
                 distance: 5.0,
+                activityType: ActivityType.Running,
             });
             await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
                 distance: 3.5,
+                activityType: ActivityType.Walking,
             });
 
             // when
@@ -92,8 +93,8 @@ describe('TrainingsController (reads)', () => {
             const token = bootstrap.utils.authUtils.generateToken(adminUser);
             const training = await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
-                title: 'Specific Training',
                 distance: 7.5,
+                activityType: ActivityType.Running,
             });
 
             // when
@@ -104,7 +105,6 @@ describe('TrainingsController (reads)', () => {
             // then
             expect(response.status).toBe(200);
             expect(response.body).toMatchObject({
-                title: 'Specific Training',
                 distance: 7.5,
                 userId: user.id,
                 id: training.id,
@@ -141,11 +141,11 @@ describe('TrainingsController (reads)', () => {
 
             await bootstrap.utils.trainingUtils.createTraining({
                 userId: user1.id,
-                title: 'User1 Training',
+                activityType: ActivityType.Running,
             });
             await bootstrap.utils.trainingUtils.createTraining({
                 userId: user2.id,
-                title: 'User2 Training',
+                activityType: ActivityType.Running,
             });
 
             // when
@@ -164,7 +164,6 @@ describe('TrainingsController (reads)', () => {
             });
             expect(response.body.trainings).toHaveLength(1);
             expect(response.body.trainings[0]).toMatchObject({
-                title: 'User1 Training',
                 userId: user1.id,
             });
         });
@@ -179,8 +178,8 @@ describe('TrainingsController (reads)', () => {
             for (let i = 1; i <= 5; i++) {
                 await bootstrap.utils.trainingUtils.createTraining({
                     userId: user.id,
-                    title: `Training ${i}`,
                     distance: i,
+                    activityType: ActivityType.Running,
                 });
             }
 
@@ -254,11 +253,13 @@ describe('TrainingsController (reads)', () => {
                 userId: user.id,
                 date: new Date('2025-01-15'),
                 distance: 5.0,
+                activityType: ActivityType.Running,
             });
             await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
                 date: new Date('2025-01-20'),
                 distance: 3.0,
+                activityType: ActivityType.Cycling,
             });
 
             // when
@@ -293,11 +294,13 @@ describe('TrainingsController (reads)', () => {
                 userId: user1.id,
                 date: new Date('2025-01-15'),
                 distance: 5.0,
+                activityType: ActivityType.Running,
             });
             await bootstrap.utils.trainingUtils.createTraining({
                 userId: user2.id,
                 date: new Date('2025-01-20'),
                 distance: 3.0,
+                activityType: ActivityType.Walking,
             });
 
             // when
@@ -315,12 +318,16 @@ describe('TrainingsController (reads)', () => {
 
             expect(user1Activity).toMatchObject({
                 userId: user1.id,
-                totalDistance: 5.0,
+                runningDistance: 5.0,
+                cyclingDistance: 0,
+                walkingDistance: 0,
                 totalTrainings: 1,
             });
             expect(user2Activity).toMatchObject({
                 userId: user2.id,
-                totalDistance: 3.0,
+                runningDistance: 0,
+                cyclingDistance: 0,
+                walkingDistance: 3.0,
                 totalTrainings: 1,
             });
         });
@@ -341,11 +348,13 @@ describe('TrainingsController (reads)', () => {
                 userId: user1.id,
                 date: new Date('2025-01-15'),
                 distance: 5.0,
+                activityType: ActivityType.Running,
             });
             await bootstrap.utils.trainingUtils.createTraining({
                 userId: user2.id,
                 date: new Date('2025-01-20'),
                 distance: 3.0,
+                activityType: ActivityType.Cycling,
             });
 
             // when

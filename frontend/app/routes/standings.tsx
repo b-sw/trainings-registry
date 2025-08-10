@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Tooltip } from '../components/Tooltip';
+import { config } from '../config/env';
 import type { UserSerialized } from '../utils/api';
 import { trainingApi, userApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
@@ -11,13 +13,13 @@ interface User {
     totalDistance: number;
     cyclingDistance: number;
     runningDistance: number;
-    otherDistance: number;
+    walkingDistance: number;
     activitiesCount: number;
-    avatar: string;
+    avatarUrl?: string;
     isCurrentUser?: boolean;
 }
 
-type ActivityTab = 'all' | 'cycling' | 'running' | 'other';
+type ActivityTab = 'all' | 'cycling' | 'running' | 'walking';
 
 export default function Standings() {
     const { user: currentUser } = useAuth();
@@ -25,6 +27,7 @@ export default function Standings() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const isDevEnv = config.IS_DEV_ENV;
 
     // Load standings data
     useEffect(() => {
@@ -49,61 +52,26 @@ export default function Standings() {
                 const usersMap = new Map<string, UserSerialized>();
                 allUsers.forEach((user) => usersMap.set(user.id, user));
 
-                // Get detailed trainings for distance breakdown by type
-                const allTrainings = await trainingApi.getAll();
-                const trainingsByUser = allTrainings.reduce(
-                    (acc, training) => {
-                        if (!acc[training.userId]) {
-                            acc[training.userId] = [];
-                        }
-                        acc[training.userId].push(training);
-                        return acc;
-                    },
-                    {} as Record<string, typeof allTrainings>,
-                );
-
-                // Calculate distance by activity type for each user
+                // Build standings using precomputed distances from backend
                 const standingsData: User[] = userActivities.map((activity, index) => {
                     const userData = usersMap.get(activity.userId);
-                    const userTrainings = trainingsByUser[activity.userId] || [];
 
-                    // Calculate distances by type based on training title/description
-                    let cyclingDistance = 0;
-                    let runningDistance = 0;
-                    let otherDistance = 0;
-
-                    userTrainings.forEach((training) => {
-                        const title = training.title.toLowerCase();
-                        const description = training.description.toLowerCase();
-
-                        if (
-                            title.includes('run') ||
-                            description.includes('run') ||
-                            title.includes('jog')
-                        ) {
-                            runningDistance += training.distance;
-                        } else if (
-                            title.includes('cycl') ||
-                            description.includes('bike') ||
-                            title.includes('cycl')
-                        ) {
-                            cyclingDistance += training.distance;
-                        } else {
-                            otherDistance += training.distance;
-                        }
-                    });
+                    const runningDistance = activity.runningDistance || 0;
+                    const cyclingDistance = activity.cyclingDistance || 0;
+                    const walkingDistance = activity.walkingDistance || 0;
+                    const totalDistance = runningDistance + cyclingDistance + walkingDistance;
 
                     return {
                         rank: index + 1, // Will be recalculated based on sorting
                         name: userData?.name || 'Unknown User',
                         email: userData?.email || '',
                         id: activity.userId,
-                        totalDistance: activity.totalDistance,
+                        totalDistance,
                         cyclingDistance,
                         runningDistance,
-                        otherDistance,
+                        walkingDistance,
                         activitiesCount: activity.totalTrainings,
-                        avatar: getAvatarForUser(userData?.name || 'Unknown', index),
+                        avatarUrl: userData?.imageUrl,
                         isCurrentUser: currentUser?.id === activity.userId,
                     };
                 });
@@ -126,17 +94,6 @@ export default function Standings() {
         loadStandings();
     }, [currentUser?.id]);
 
-    const getAvatarForUser = (name: string, index: number): string => {
-        if (index === 0) return '🏆';
-        if (index === 1) return '🥈';
-        if (index === 2) return '🥉';
-
-        // Generate avatar based on name
-        const avatars = ['👨‍💻', '👩‍💻', '🧑‍💼', '👨‍🔬', '👩‍🔬', '🧑‍🎨', '👨‍🏫', '👩‍🏫', '🧑‍⚕️', '👨‍⚖️'];
-        const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        return avatars[hash % avatars.length];
-    };
-
     // Get current user data
     const currentUserData = users.find((user) => user.isCurrentUser);
 
@@ -151,8 +108,8 @@ export default function Standings() {
                         return b.cyclingDistance - a.cyclingDistance;
                     case 'running':
                         return b.runningDistance - a.runningDistance;
-                    case 'other':
-                        return b.otherDistance - a.otherDistance;
+                    case 'walking':
+                        return b.walkingDistance - a.walkingDistance;
                     default:
                         return b.totalDistance - a.totalDistance;
                 }
@@ -168,8 +125,8 @@ export default function Standings() {
                 return user.cyclingDistance;
             case 'running':
                 return user.runningDistance;
-            case 'other':
-                return user.otherDistance;
+            case 'walking':
+                return user.walkingDistance;
             default:
                 return user.totalDistance;
         }
@@ -193,7 +150,7 @@ export default function Standings() {
                     <p className="text-red-600 mb-4">{error}</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="px-4 py-2 bg-[#0161D5] text-white rounded-lg hover:bg-[#0152b5]"
                     >
                         Retry
                     </button>
@@ -203,44 +160,59 @@ export default function Standings() {
     }
 
     return (
-        <div className="bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-gray-50 min-h-[calc(100vh-0px)]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col h-[calc(100vh-64px)]">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-6 md:mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Global Standings</h1>
-                        <p className="mt-2 text-gray-600">
+                        <h1 className="text-2xl md:text-3xl font-oswald font-bold text-gray-900">
+                            TOP PERFORMERS
+                        </h1>
+                        <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-600">
                             See how you rank against other team members in various activities.
                         </p>
                     </div>
-                    <button
-                        onClick={() => (window.location.href = '/my-trainings?add=true')}
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                        <span className="mr-2">+</span>
-                        Add Activity
-                    </button>
+                    {isDevEnv ? (
+                        <button
+                            onClick={() => (window.location.href = '/my-trainings?add=true')}
+                            className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                        >
+                            <span className="mr-2">+</span>
+                            ADD ACTIVITY
+                        </button>
+                    ) : (
+                        <Tooltip label="The event has not started yet">
+                            <button
+                                onClick={() => undefined}
+                                disabled
+                                className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white opacity-50 cursor-not-allowed"
+                            >
+                                <span className="mr-2">+</span>
+                                ADD ACTIVITY
+                            </button>
+                        </Tooltip>
+                    )}
                 </div>
 
                 {/* User Summary Cards */}
                 {currentUserData && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                        <div className="bg-white rounded-lg shadow p-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8 flex-shrink-0">
+                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🏆 Overall Rank
                             </h3>
-                            <div className="text-2xl font-bold text-blue-600">
+                            <div className="text-xl md:text-2xl font-oswald font-bold text-[#0161D5]">
                                 #{currentUserData.rank}
                             </div>
                             <p className="text-gray-600 text-sm">
                                 {currentUserData.totalDistance.toFixed(1)} km total
                             </p>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-6">
+                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🚴‍♂️ Cycling Rank
                             </h3>
-                            <div className="text-2xl font-bold text-blue-600">
+                            <div className="text-xl md:text-2xl font-oswald font-bold text-[#0161D5]">
                                 #
                                 {getRankingByCategory('cycling').findIndex(
                                     (user) => user.isCurrentUser,
@@ -250,11 +222,11 @@ export default function Standings() {
                                 {currentUserData.cyclingDistance.toFixed(1)} km
                             </p>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-6">
+                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🏃‍♂️ Running Rank
                             </h3>
-                            <div className="text-2xl font-bold text-green-600">
+                            <div className="text-xl md:text-2xl font-oswald font-bold text-green-600">
                                 #
                                 {getRankingByCategory('running').findIndex(
                                     (user) => user.isCurrentUser,
@@ -264,39 +236,39 @@ export default function Standings() {
                                 {currentUserData.runningDistance.toFixed(1)} km
                             </p>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-6">
+                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
-                                ⭐ Other Rank
+                                🚶‍♂️ Walking Rank
                             </h3>
-                            <div className="text-2xl font-bold text-purple-600">
+                            <div className="text-xl md:text-2xl font-oswald font-bold text-yellow-600">
                                 #
-                                {getRankingByCategory('other').findIndex(
+                                {getRankingByCategory('walking').findIndex(
                                     (user) => user.isCurrentUser,
                                 ) + 1}
                             </div>
                             <p className="text-gray-600 text-sm">
-                                {currentUserData.otherDistance.toFixed(1)} km
+                                {currentUserData.walkingDistance.toFixed(1)} km
                             </p>
                         </div>
                     </div>
                 )}
 
-                {/* Activity Tabs */}
-                <div className="bg-white rounded-lg shadow mb-6">
+                {/* Activity Tabs - hide on mobile to save space */}
+                <div className="bg-white rounded-lg shadow mb-6 flex-shrink-0 hidden md:block">
                     <div className="border-b border-gray-200">
                         <nav className="flex space-x-8 px-6">
                             {[
                                 { key: 'all' as const, label: 'All Activities', icon: '🏆' },
                                 { key: 'cycling' as const, label: 'Cycling', icon: '🚴‍♂️' },
                                 { key: 'running' as const, label: 'Running', icon: '🏃‍♂️' },
-                                { key: 'other' as const, label: 'Other', icon: '⭐' },
+                                { key: 'walking' as const, label: 'Walking', icon: '🚶‍♂️' },
                             ].map((tab) => (
                                 <button
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
-                                    className={`flex items-center space-x-2 py-4 border-b-2 font-medium text-sm ${
+                                    className={`no-rounded flex items-center space-x-2 py-4 border-b-2 font-medium text-sm ${
                                         activeTab === tab.key
-                                            ? 'border-blue-500 text-blue-600'
+                                            ? 'border-[#0161D5] text-[#0161D5]'
                                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                                 >
@@ -309,7 +281,7 @@ export default function Standings() {
                 </div>
 
                 {/* Leaderboard */}
-                <div className="bg-white rounded-lg shadow">
+                <div className="bg-white rounded-lg shadow flex-1 flex flex-col min-h-0">
                     <div className="px-6 py-4 border-b border-gray-200">
                         <h3 className="text-lg font-medium text-gray-900">
                             {activeTab === 'all'
@@ -330,15 +302,11 @@ export default function Standings() {
                             </p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
+                        <div className="divide-y divide-gray-200 overflow-y-auto flex-1 min-h-0 scrollbar-custom">
                             {displayUsers.map((user) => (
                                 <div
                                     key={user.id}
-                                    className={`px-6 py-4 hover:bg-gray-50 ${
-                                        user.isCurrentUser
-                                            ? 'bg-blue-50 border-l-4 border-blue-400'
-                                            : ''
-                                    }`}
+                                    className={`px-6 py-4 hover:bg-gray-50 ${user.isCurrentUser ? 'bg-blue-50 border-l-4 border-blue-400' : ''}`}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-4">
@@ -348,14 +316,26 @@ export default function Standings() {
                                                 </span>
                                             </div>
                                             <div className="flex-shrink-0">
-                                                <span className="text-4xl">{user.avatar}</span>
+                                                {user.avatarUrl ? (
+                                                    <img
+                                                        src={user.avatarUrl}
+                                                        alt={user.name}
+                                                        className="w-10 h-10 rounded-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                        <span className="text-gray-600 font-medium">
+                                                            {user.name?.charAt(0) || '?'}
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div>
                                                 <div className="flex items-center space-x-2">
-                                                    <h4 className="text-lg font-medium text-gray-900">
+                                                    <h4 className="text-base md:text-lg font-medium text-gray-900">
                                                         {user.name}
                                                         {user.isCurrentUser && (
-                                                            <span className="ml-2 text-sm text-blue-600 font-medium">
+                                                            <span className="ml-2 text-sm text-[#0161D5] font-medium">
                                                                 (You)
                                                             </span>
                                                         )}
@@ -364,7 +344,7 @@ export default function Standings() {
                                                 <p className="text-sm text-gray-500">
                                                     {user.email}
                                                 </p>
-                                                <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600">
+                                                <div className="flex items-center space-x-3 mt-1 text-xs md:text-sm text-gray-600">
                                                     <span>{user.activitiesCount} activities</span>
                                                     <span>•</span>
                                                     <span>
@@ -382,15 +362,16 @@ export default function Standings() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <div className="text-2xl font-bold text-gray-900">
-                                                {getDistanceForTab(user, activeTab).toFixed(1)} km
+                                        {/* Hide right-side details on mobile for space */}
+                                        <div className="hidden md:block text-right">
+                                            <div className="text-2xl font-oswald font-bold text-gray-900">
+                                                {getDistanceForTab(user, activeTab).toFixed(1)} KM
                                             </div>
                                             {activeTab === 'all' && (
-                                                <div className="text-sm text-gray-500 mt-1">
+                                                <div className="text-sm font-oswald text-gray-500 mt-1">
                                                     🚴‍♂️ {user.cyclingDistance.toFixed(1)} • 🏃‍♂️{' '}
-                                                    {user.runningDistance.toFixed(1)} • ⭐{' '}
-                                                    {user.otherDistance.toFixed(1)}
+                                                    {user.runningDistance.toFixed(1)} • 🚶‍♂️{' '}
+                                                    {user.walkingDistance.toFixed(1)}
                                                 </div>
                                             )}
                                         </div>

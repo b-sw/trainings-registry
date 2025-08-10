@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { TrainingEntity } from '../../src/trainings/entities/training.entity';
+import { ActivityType, TrainingEntity } from '../../src/trainings/entities/training.entity';
 import { TrainingNormalized } from '../../src/trainings/entities/training.interface';
 import { TrainingSerializer } from '../../src/trainings/entities/training.serializer';
 
@@ -23,6 +23,7 @@ export class TrainingUtils {
         description?: string;
         date?: Date;
         distance?: number;
+        activityType?: ActivityType;
     }): Promise<TrainingNormalized> {
         const training = await this.trainingModel.create({
             userId: params?.userId || 'default-user-id',
@@ -30,6 +31,7 @@ export class TrainingUtils {
             description: params?.description || 'Test training description',
             date: params?.date || new Date(),
             distance: params?.distance || 5.0,
+            activityType: params?.activityType || ActivityType.Running,
         });
 
         return TrainingSerializer.normalize(training);
@@ -42,9 +44,10 @@ export class TrainingUtils {
             title?: string;
             description?: string;
             distance?: number;
+            activityType?: ActivityType;
         },
     ): Promise<TrainingNormalized[]> {
-        const trainings = [];
+        const trainings = [] as TrainingNormalized[];
         for (let i = 0; i < count; i++) {
             const training = await this.createTraining({
                 userId,
@@ -52,6 +55,7 @@ export class TrainingUtils {
                 description: `${baseParams?.description || 'Description'} ${i + 1}`,
                 distance: baseParams?.distance || Math.random() * 10 + 1,
                 date: new Date(Date.now() + i * 24 * 60 * 60 * 1000), // Each day apart
+                activityType: baseParams?.activityType || ActivityType.Running,
             });
             trainings.push(training);
         }

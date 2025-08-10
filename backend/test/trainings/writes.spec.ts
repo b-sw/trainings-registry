@@ -1,4 +1,6 @@
+import MockDate from 'mockdate';
 import * as request from 'supertest';
+import { ActivityType } from '../../src/trainings/entities/training.entity';
 import { createTestApp } from '../utils/bootstrap';
 
 describe('TrainingsController (writes)', () => {
@@ -6,6 +8,7 @@ describe('TrainingsController (writes)', () => {
 
     beforeAll(async () => {
         bootstrap = await createTestApp();
+        MockDate.set('2025-08-12T05:00:00.000Z');
     });
 
     beforeEach(async () => {
@@ -23,10 +26,10 @@ describe('TrainingsController (writes)', () => {
             const token = bootstrap.utils.authUtils.generateToken(user);
             const createTrainingDto = {
                 userId: user.id,
-                title: 'New Training',
                 description: 'A great training session',
                 date: new Date('2025-01-15T00:00:00.000Z').toISOString(),
                 distance: 5.5,
+                activityType: ActivityType.Running,
             };
 
             // when
@@ -38,7 +41,6 @@ describe('TrainingsController (writes)', () => {
             // then
             expect(response.status).toBe(201);
             expect(response.body).toMatchObject({
-                title: 'New Training',
                 description: 'A great training session',
                 distance: 5.5,
                 userId: user.id,
@@ -52,10 +54,10 @@ describe('TrainingsController (writes)', () => {
             const token = bootstrap.utils.authUtils.generateToken(user);
             const createTrainingDto = {
                 userId: user.id,
-                title: 'My Training',
                 description: 'Self training',
                 date: new Date('2025-01-15T00:00:00.000Z').toISOString(),
                 distance: 3.0,
+                activityType: ActivityType.Cycling,
             };
 
             // when
@@ -68,7 +70,7 @@ describe('TrainingsController (writes)', () => {
             expect(response.status).toBe(201);
             expect(response.body).toMatchObject({
                 userId: user.id,
-                title: 'My Training',
+                description: 'Self training',
             });
         });
 
@@ -79,10 +81,10 @@ describe('TrainingsController (writes)', () => {
             const token = bootstrap.utils.authUtils.generateToken(user1);
             const createTrainingDto = {
                 userId: user2.id, // Trying to create for different user
-                title: 'Hacked Training',
                 description: 'This should fail',
                 date: new Date('2025-01-15T00:00:00.000Z').toISOString(),
                 distance: 1.0,
+                activityType: ActivityType.Walking,
             };
 
             // when
@@ -102,10 +104,10 @@ describe('TrainingsController (writes)', () => {
             const token = bootstrap.utils.authUtils.generateToken(adminUser);
             const createTrainingDto = {
                 userId: user.id,
-                title: 'Admin Created Training',
                 description: 'Created by admin',
                 date: new Date('2025-01-15T00:00:00.000Z').toISOString(),
                 distance: 2.0,
+                activityType: ActivityType.Running,
             };
 
             // when
@@ -118,7 +120,7 @@ describe('TrainingsController (writes)', () => {
             expect(response.status).toBe(201);
             expect(response.body).toMatchObject({
                 userId: user.id,
-                title: 'Admin Created Training',
+                description: 'Created by admin',
             });
         });
 
@@ -126,10 +128,10 @@ describe('TrainingsController (writes)', () => {
             // given
             const createTrainingDto = {
                 userId: 'some-user-id',
-                title: 'Unauthorized Training',
                 description: 'Should fail',
                 date: new Date('2025-01-15T00:00:00.000Z').toISOString(),
                 distance: 1.0,
+                activityType: ActivityType.Running,
             };
 
             // when
@@ -150,11 +152,10 @@ describe('TrainingsController (writes)', () => {
             const token = bootstrap.utils.authUtils.generateToken(adminUser);
             const training = await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
-                title: 'Original Title',
                 distance: 5.0,
             });
             const updateTrainingDto = {
-                title: 'Updated Title',
+                description: 'Updated description',
                 distance: 7.5,
             };
 
@@ -167,9 +168,9 @@ describe('TrainingsController (writes)', () => {
             // then
             expect(response.status).toBe(200);
             expect(response.body).toMatchObject({
-                title: 'Updated Title',
+                description: 'Updated description',
                 distance: 7.5,
-                userId: user.id, // Should remain unchanged
+                userId: user.id,
                 id: training.id,
             });
         });
@@ -179,7 +180,7 @@ describe('TrainingsController (writes)', () => {
             const adminUser = await bootstrap.utils.userUtils.createAdminUser();
             const token = bootstrap.utils.authUtils.generateToken(adminUser);
             const nonExistentId = '507f1f77bcf86cd799439011';
-            const updateTrainingDto = { title: 'Updated Title' };
+            const updateTrainingDto = { description: 'Updated description' };
 
             // when
             const response = await request(bootstrap.app.getHttpServer())
@@ -199,7 +200,7 @@ describe('TrainingsController (writes)', () => {
             const training = await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
             });
-            const updateTrainingDto = { title: 'Hacked Title' };
+            const updateTrainingDto = { description: 'Hacked description' };
 
             // when
             const response = await request(bootstrap.app.getHttpServer())
@@ -213,14 +214,12 @@ describe('TrainingsController (writes)', () => {
     });
 
     describe('DELETE /trainings/:trainingId', () => {
-        it('deletes training successfully', async () => {
+        it('allows user to delete their own training', async () => {
             // given
             const user = await bootstrap.utils.userUtils.createDefaultUser();
-            const adminUser = await bootstrap.utils.userUtils.createAdminUser();
-            const token = bootstrap.utils.authUtils.generateToken(adminUser);
+            const token = bootstrap.utils.authUtils.generateToken(user);
             const training = await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
-                title: 'To Delete Training',
             });
 
             // when
@@ -230,14 +229,30 @@ describe('TrainingsController (writes)', () => {
 
             // then
             expect(response.status).toBe(200);
-            expect(response.body).toMatchObject({
-                title: 'To Delete Training',
-                id: training.id,
+            expect(response.body).toMatchObject({ id: training.id });
+        });
+
+        it('deletes training successfully by admin', async () => {
+            // given
+            const user = await bootstrap.utils.userUtils.createDefaultUser();
+            const adminUser = await bootstrap.utils.userUtils.createAdminUser();
+            const token = bootstrap.utils.authUtils.generateToken(adminUser);
+            const training = await bootstrap.utils.trainingUtils.createTraining({
+                userId: user.id,
             });
+
+            // when
+            const response = await request(bootstrap.app.getHttpServer())
+                .delete(`/trainings/${training.id}`)
+                .set('Authorization', `Bearer ${token}`);
+
+            // then
+            expect(response.status).toBe(200);
+            expect(response.body).toMatchObject({ id: training.id });
 
             // Verify training is actually deleted
             const deletedTraining = await bootstrap.utils.trainingUtils.getTraining();
-            expect(deletedTraining?.title).not.toBe('To Delete Training');
+            expect(deletedTraining?.id).not.toBe(training.id);
         });
 
         it('returns 404 for non-existent training', async () => {
@@ -255,13 +270,13 @@ describe('TrainingsController (writes)', () => {
             expect(response.status).toBe(404);
         });
 
-        it('returns 403 when regular user tries to delete', async () => {
+        it('returns 403 when non-owner tries to delete', async () => {
             // given
-            const user = await bootstrap.utils.userUtils.createDefaultUser();
-            const regularUser = await bootstrap.utils.userUtils.createDefaultUser();
-            const token = bootstrap.utils.authUtils.generateToken(regularUser);
+            const owner = await bootstrap.utils.userUtils.createDefaultUser();
+            const other = await bootstrap.utils.userUtils.createDefaultUser();
+            const token = bootstrap.utils.authUtils.generateToken(other);
             const training = await bootstrap.utils.trainingUtils.createTraining({
-                userId: user.id,
+                userId: owner.id,
             });
 
             // when
@@ -280,7 +295,6 @@ describe('TrainingsController (writes)', () => {
             const token = bootstrap.utils.authUtils.generateToken(adminUser);
             const training = await bootstrap.utils.trainingUtils.createTraining({
                 userId: user.id,
-                title: 'Admin Delete Training',
             });
 
             // when
@@ -290,10 +304,7 @@ describe('TrainingsController (writes)', () => {
 
             // then
             expect(response.status).toBe(200);
-            expect(response.body).toMatchObject({
-                title: 'Admin Delete Training',
-                id: training.id,
-            });
+            expect(response.body).toMatchObject({ id: training.id });
         });
     });
 });

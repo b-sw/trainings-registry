@@ -8,6 +8,7 @@ export class UserSerializer {
             email: entity.email,
             name: entity.name,
             role: entity.role,
+            imageUrl: entity.imageUrl,
             createdAt: entity.createdAt,
             updatedAt: entity.updatedAt,
         };
@@ -23,6 +24,7 @@ export class UserSerializer {
             email: normalized.email,
             name: normalized.name,
             role: normalized.role,
+            imageUrl: normalized.imageUrl,
             createdAt: normalized.createdAt,
             updatedAt: normalized.updatedAt,
         };

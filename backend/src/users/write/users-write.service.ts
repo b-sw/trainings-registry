@@ -25,6 +25,7 @@ export class UsersWriteService {
             email: dto.email,
             name: dto.name,
             role: dto.role,
+            imageUrl: dto.imageUrl,
         });
 
         return UserSerializer.normalize(entity);
@@ -51,6 +52,10 @@ export class UsersWriteService {
 
         if (dto.role) {
             updateQuery.role = dto.role;
+        }
+
+        if (dto.imageUrl) {
+            updateQuery.imageUrl = dto.imageUrl as any;
         }
 
         const entity = await this.userModel.findByIdAndUpdate(userId, updateQuery, { new: true });

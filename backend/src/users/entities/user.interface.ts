@@ -6,6 +6,7 @@ export class UserNormalized {
     email: string;
     name: string;
     role: Role;
+    imageUrl?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -22,6 +23,9 @@ export class UserSerialized {
 
     @ApiProperty({ enum: Role })
     role: Role;
+
+    @ApiProperty({ required: false })
+    imageUrl?: string;
 
     @ApiProperty()
     createdAt: Date;
