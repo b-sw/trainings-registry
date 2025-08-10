@@ -36,6 +36,16 @@ body {
     @apply outline-[#0161D5];
 }
 
+/* Brand title font */
+.brand-title {
+    font-family: 'Oswald', var(--font-sans);
+    color: #0161d5;
+}
+
+.font-oswald {
+    font-family: 'Oswald', var(--font-sans);
+}
+
 /* Page and button styles for original components */
 .page {
     @apply max-w-4xl mx-auto p-6;

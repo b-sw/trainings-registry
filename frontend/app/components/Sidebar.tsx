@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router';
 import { useAuth } from '../utils/auth';
+import logo from '../welcome/logo.svg';
 
 export function Sidebar() {
     const location = useLocation();
@@ -28,10 +29,10 @@ export function Sidebar() {
             {/* Logo/Brand */}
             <div className="flex items-center px-6 py-4 border-b border-gray-200">
                 <Link to="/my-trainings" className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-[#0161D5] rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">M</span>
-                    </div>
-                    <span className="text-xl font-bold text-gray-900">Move for Ukraine</span>
+                    <img src={logo} alt="Move for Ukraine logo" className="w-8 h-8" />
+                    <span className="text-2xl font-bold brand-title text-[#0161D5]">
+                        MOVE FOR UKRAINE
+                    </span>
                 </Link>
             </div>
 
