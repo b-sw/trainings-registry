@@ -199,10 +199,20 @@ export default function MyTrainings() {
 
     const handleDelete = async (activityId: string) => {
         try {
+            const activityToDelete = activities.find((a) => a.id === activityId);
             await trainingApi.delete(activityId);
             setActivities((prev) => prev.filter((a) => a.id !== activityId));
+
+            if (activityToDelete) {
+                const typeLabel =
+                    activityToDelete.type.charAt(0).toUpperCase() + activityToDelete.type.slice(1);
+                toast.success(`Deleted ${typeLabel} ${activityToDelete.distance} km`);
+            } else {
+                toast.success('Deleted activity');
+            }
         } catch (err) {
             console.error('Failed to delete activity:', err);
+            toast.error('Failed to delete activity. Please try again.');
             setError('Failed to delete activity. Please try again.');
         }
     };
@@ -236,20 +246,20 @@ export default function MyTrainings() {
 
     return (
         <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col min-h-0">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8 flex-shrink-0">
+                <div className="flex items-center justify-between mb-6 md:mb-8 flex-shrink-0">
                     <div>
-                        <h1 className="text-3xl font-oswald font-bold text-gray-900">
+                        <h1 className="text-2xl md:text-3xl font-oswald font-bold text-gray-900">
                             MY ACTIVITIES
                         </h1>
-                        <p className="mt-2 text-gray-600">
+                        <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-600">
                             Track your fitness journey and see your progress over time.
                         </p>
                     </div>
                     <button
                         onClick={() => setShowAddForm(!showAddForm)}
-                        className="font-oswald inline-flex items-center px-4 py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                        className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                     >
                         <span className="mr-2">+</span>
                         {showAddForm ? 'CANCEL' : 'ADD ACTIVITY'}
@@ -257,59 +267,65 @@ export default function MyTrainings() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 flex-shrink-0">
-                    <div className="bg-white rounded-lg shadow p-6">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8 flex-shrink-0">
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6">
                         <div className="flex items-center">
-                            <div className="p-2 bg-indigo-100 rounded-lg">
-                                <span className="text-2xl">🎯</span>
+                            <div className="p-1.5 md:p-2 bg-indigo-100 rounded-lg">
+                                <span className="text-xl md:text-2xl">🎯</span>
                             </div>
-                            <div className="ml-4">
-                                <h3 className="text-sm font-medium text-gray-500">
+                            <div className="ml-3 md:ml-4">
+                                <h3 className="text-xs md:text-sm font-medium text-gray-500 whitespace-nowrap">
                                     Total Distance
                                 </h3>
-                                <p className="text-2xl font-oswald font-bold text-gray-900">
+                                <p className="text-xl md:text-2xl font-oswald font-bold text-gray-900 whitespace-nowrap">
                                     {totalDistance.toFixed(1)} KM
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow p-6">
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6">
                         <div className="flex items-center">
-                            <div className="p-2 bg-green-100 rounded-lg">
-                                <span className="text-2xl">🏃‍♂️</span>
+                            <div className="p-1.5 md:p-2 bg-green-100 rounded-lg">
+                                <span className="text-xl md:text-2xl">🏃‍♂️</span>
                             </div>
-                            <div className="ml-4">
-                                <h3 className="text-sm font-medium text-gray-500">Running</h3>
-                                <p className="text-2xl font-oswald font-bold text-gray-900">
+                            <div className="ml-3 md:ml-4">
+                                <h3 className="text-xs md:text-sm font-medium text-gray-500 whitespace-nowrap">
+                                    Running
+                                </h3>
+                                <p className="text-xl md:text-2xl font-oswald font-bold text-gray-900 whitespace-nowrap">
                                     {runningDistance.toFixed(1)} KM
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow p-6">
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6">
                         <div className="flex items-center">
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                                <span className="text-2xl">🚴‍♂️</span>
+                            <div className="p-1.5 md:p-2 bg-blue-100 rounded-lg">
+                                <span className="text-xl md:text-2xl">🚴‍♂️</span>
                             </div>
-                            <div className="ml-4">
-                                <h3 className="text-sm font-medium text-gray-500">Cycling</h3>
-                                <p className="text-2xl font-oswald font-bold text-gray-900">
+                            <div className="ml-3 md:ml-4">
+                                <h3 className="text-xs md:text-sm font-medium text-gray-500 whitespace-nowrap">
+                                    Cycling
+                                </h3>
+                                <p className="text-xl md:text-2xl font-oswald font-bold text-gray-900 whitespace-nowrap">
                                     {cyclingDistance.toFixed(1)} KM
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow p-6">
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6">
                         <div className="flex items-center">
-                            <div className="p-2 bg-yellow-100 rounded-lg">
-                                <span className="text-2xl">🚶‍♂️</span>
+                            <div className="p-1.5 md:p-2 bg-yellow-100 rounded-lg">
+                                <span className="text-xl md:text-2xl">🚶‍♂️</span>
                             </div>
-                            <div className="ml-4">
-                                <h3 className="text-sm font-medium text-gray-500">Walking</h3>
-                                <p className="text-2xl font-oswald font-bold text-gray-900">
+                            <div className="ml-3 md:ml-4">
+                                <h3 className="text-xs md:text-sm font-medium text-gray-500 whitespace-nowrap">
+                                    Walking
+                                </h3>
+                                <p className="text-xl md:text-2xl font-oswald font-bold text-gray-900 whitespace-nowrap">
                                     {walkingDistance.toFixed(1)} KM
                                 </p>
                             </div>
@@ -319,10 +335,12 @@ export default function MyTrainings() {
 
                 {/* Add Activity Form */}
                 {showAddForm && (
-                    <div className="bg-white rounded-lg shadow p-6 mb-6 flex-shrink-0">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Activity</h3>
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6 mb-4 md:mb-6 flex-shrink-0">
+                        <h3 className="text-base md:text-lg font-medium text-gray-900 mb-3 md:mb-4">
+                            Add New Activity
+                        </h3>
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Activity Type
@@ -390,13 +408,13 @@ export default function MyTrainings() {
                                 <button
                                     type="button"
                                     onClick={() => setShowAddForm(false)}
-                                    className="font-oswald px-4 py-2 border border-gray-300 rounded-md text-md font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                                    className="font-oswald px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-md text-sm md:text-md font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                                 >
                                     CANCEL
                                 </button>
                                 <button
                                     type="submit"
-                                    className="font-oswald px-4 py-2 bg-[#0161D5] border border-transparent rounded-md text-md font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                                    className="font-oswald px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md text-sm md:text-md font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                                 >
                                     ADD ACTIVITY
                                 </button>
@@ -498,8 +516,8 @@ export default function MyTrainings() {
                                     </div>
                                 )}
 
-                                {/* Observer element for infinite scroll */}
-                                <div ref={observerRef} className="h-0"></div>
+                                {/* Sentinel element */}
+                                <div ref={observerRef} className="h-4" />
                             </div>
                         </div>
                     )}

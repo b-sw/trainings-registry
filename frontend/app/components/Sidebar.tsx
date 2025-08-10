@@ -2,7 +2,11 @@ import { Link, useLocation } from 'react-router';
 import { useAuth } from '../utils/auth';
 import logo from '../welcome/logo.svg';
 
-export function Sidebar() {
+interface SidebarProps {
+    onNavigate?: () => void;
+}
+
+export function Sidebar({ onNavigate }: SidebarProps) {
     const location = useLocation();
     const { user, logout } = useAuth();
 
@@ -28,7 +32,11 @@ export function Sidebar() {
         <div className="flex flex-col h-full bg-white border-r border-gray-200">
             {/* Logo/Brand */}
             <div className="flex items-center px-6 py-4 border-b border-gray-200">
-                <Link to="/my-trainings" className="flex items-center space-x-3">
+                <Link
+                    to="/my-trainings"
+                    className="flex items-center space-x-3"
+                    onClick={onNavigate}
+                >
                     <img src={logo} alt="Move for Ukraine logo" className="w-8 h-8" />
                     <span className="text-2xl font-bold brand-title text-[#0161D5]">
                         MOVE FOR UKRAINE
@@ -45,6 +53,7 @@ export function Sidebar() {
                             key={item.name}
                             to={item.href}
                             className={`sidebar-item ${isActive ? 'active' : ''}`}
+                            onClick={onNavigate}
                         >
                             <span className="text-lg">{item.icon}</span>
                             <span>{item.name}</span>
@@ -83,7 +92,10 @@ export function Sidebar() {
             {/* Logout */}
             <div className="px-4 py-4 border-t border-gray-200">
                 <button
-                    onClick={logout}
+                    onClick={() => {
+                        logout();
+                        onNavigate?.();
+                    }}
                     className="flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 w-full"
                 >
                     <span className="text-lg">🚪</span>

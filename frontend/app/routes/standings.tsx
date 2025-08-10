@@ -160,18 +160,18 @@ export default function Standings() {
         <div className="bg-gray-50 min-h-[calc(100vh-0px)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col h-[calc(100vh-64px)]">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-6 md:mb-8">
                     <div>
-                        <h1 className="text-3xl font-oswald font-bold text-gray-900">
+                        <h1 className="text-2xl md:text-3xl font-oswald font-bold text-gray-900">
                             TOP PERFORMERS
                         </h1>
-                        <p className="mt-2 text-gray-600">
+                        <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-600">
                             See how you rank against other team members in various activities.
                         </p>
                     </div>
                     <button
                         onClick={() => (window.location.href = '/my-trainings?add=true')}
-                        className="font-oswald inline-flex items-center px-4 py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                        className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                     >
                         <span className="mr-2">+</span>
                         ADD ACTIVITY
@@ -180,23 +180,23 @@ export default function Standings() {
 
                 {/* User Summary Cards */}
                 {currentUserData && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 flex-shrink-0">
-                        <div className="bg-white rounded-lg shadow p-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8 flex-shrink-0">
+                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🏆 Overall Rank
                             </h3>
-                            <div className="text-2xl font-oswald font-bold text-[#0161D5]">
+                            <div className="text-xl md:text-2xl font-oswald font-bold text-[#0161D5]">
                                 #{currentUserData.rank}
                             </div>
                             <p className="text-gray-600 text-sm">
                                 {currentUserData.totalDistance.toFixed(1)} km total
                             </p>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-6">
+                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🚴‍♂️ Cycling Rank
                             </h3>
-                            <div className="text-2xl font-oswald font-bold text-[#0161D5]">
+                            <div className="text-xl md:text-2xl font-oswald font-bold text-[#0161D5]">
                                 #
                                 {getRankingByCategory('cycling').findIndex(
                                     (user) => user.isCurrentUser,
@@ -206,11 +206,11 @@ export default function Standings() {
                                 {currentUserData.cyclingDistance.toFixed(1)} km
                             </p>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-6">
+                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🏃‍♂️ Running Rank
                             </h3>
-                            <div className="text-2xl font-oswald font-bold text-green-600">
+                            <div className="text-xl md:text-2xl font-oswald font-bold text-green-600">
                                 #
                                 {getRankingByCategory('running').findIndex(
                                     (user) => user.isCurrentUser,
@@ -220,11 +220,11 @@ export default function Standings() {
                                 {currentUserData.runningDistance.toFixed(1)} km
                             </p>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-6">
+                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
                             <h3 className="text-sm font-medium text-gray-600 mb-1">
                                 🚶‍♂️ Walking Rank
                             </h3>
-                            <div className="text-2xl font-oswald font-bold text-yellow-600">
+                            <div className="text-xl md:text-2xl font-oswald font-bold text-yellow-600">
                                 #
                                 {getRankingByCategory('walking').findIndex(
                                     (user) => user.isCurrentUser,
@@ -237,8 +237,8 @@ export default function Standings() {
                     </div>
                 )}
 
-                {/* Activity Tabs */}
-                <div className="bg-white rounded-lg shadow mb-6 flex-shrink-0">
+                {/* Activity Tabs - hide on mobile to save space */}
+                <div className="bg-white rounded-lg shadow mb-6 flex-shrink-0 hidden md:block">
                     <div className="border-b border-gray-200">
                         <nav className="flex space-x-8 px-6">
                             {[
@@ -316,7 +316,7 @@ export default function Standings() {
                                             </div>
                                             <div>
                                                 <div className="flex items-center space-x-2">
-                                                    <h4 className="text-lg font-medium text-gray-900">
+                                                    <h4 className="text-base md:text-lg font-medium text-gray-900">
                                                         {user.name}
                                                         {user.isCurrentUser && (
                                                             <span className="ml-2 text-sm text-[#0161D5] font-medium">
@@ -328,7 +328,7 @@ export default function Standings() {
                                                 <p className="text-sm text-gray-500">
                                                     {user.email}
                                                 </p>
-                                                <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600">
+                                                <div className="flex items-center space-x-3 mt-1 text-xs md:text-sm text-gray-600">
                                                     <span>{user.activitiesCount} activities</span>
                                                     <span>•</span>
                                                     <span>
@@ -346,7 +346,8 @@ export default function Standings() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="text-right">
+                                        {/* Hide right-side details on mobile for space */}
+                                        <div className="hidden md:block text-right">
                                             <div className="text-2xl font-oswald font-bold text-gray-900">
                                                 {getDistanceForTab(user, activeTab).toFixed(1)} KM
                                             </div>
