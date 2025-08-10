@@ -20,6 +20,7 @@ export interface UserSerialized {
     role: 'Admin' | 'Employee';
     createdAt: Date;
     updatedAt: Date;
+    imageUrl?: string;
 }
 
 export interface UserActivity {

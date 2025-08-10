@@ -13,7 +13,7 @@ interface User {
     runningDistance: number;
     walkingDistance: number;
     activitiesCount: number;
-    avatar: string;
+    avatarUrl?: string;
     isCurrentUser?: boolean;
 }
 
@@ -68,7 +68,7 @@ export default function Standings() {
                         runningDistance,
                         walkingDistance,
                         activitiesCount: activity.totalTrainings,
-                        avatar: getAvatarForUser(userData?.name || 'Unknown', index),
+                        avatarUrl: userData?.imageUrl,
                         isCurrentUser: currentUser?.id === activity.userId,
                     };
                 });
@@ -90,17 +90,6 @@ export default function Standings() {
 
         loadStandings();
     }, [currentUser?.id]);
-
-    const getAvatarForUser = (name: string, index: number): string => {
-        if (index === 0) return '🏆';
-        if (index === 1) return '🥈';
-        if (index === 2) return '🥉';
-
-        // Generate avatar based on name
-        const avatars = ['👨‍💻', '👩‍💻', '🧑‍💼', '👨‍🔬', '👩‍🔬', '🧑‍🎨', '👨‍🏫', '👩‍🏫', '🧑‍⚕️', '👨‍⚖️'];
-        const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        return avatars[hash % avatars.length];
-    };
 
     // Get current user data
     const currentUserData = users.find((user) => user.isCurrentUser);
@@ -309,7 +298,19 @@ export default function Standings() {
                                                 </span>
                                             </div>
                                             <div className="flex-shrink-0">
-                                                <span className="text-4xl">{user.avatar}</span>
+                                                {user.avatarUrl ? (
+                                                    <img
+                                                        src={user.avatarUrl}
+                                                        alt={user.name}
+                                                        className="w-10 h-10 rounded-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                        <span className="text-gray-600 font-medium">
+                                                            {user.name?.charAt(0) || '?'}
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div>
                                                 <div className="flex items-center space-x-2">

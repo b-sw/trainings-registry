@@ -55,8 +55,12 @@ export function Sidebar() {
             {/* User Profile */}
             <div className="px-4 py-2 border-t border-gray-200">
                 <div className="flex items-center space-x-3 px-4 py-3">
-                    {user?.picture ? (
-                        <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full" />
+                    {user?.imageUrl || user?.picture ? (
+                        <img
+                            src={user.imageUrl || user.picture!}
+                            alt={user?.name || 'User avatar'}
+                            className="w-8 h-8 rounded-full object-cover"
+                        />
                     ) : (
                         <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                             <span className="text-gray-600 text-sm font-medium">
