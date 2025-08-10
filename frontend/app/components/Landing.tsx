@@ -84,7 +84,7 @@ export function Landing() {
                         {/* Middle right - Fit-content Login button */}
                         <div className="row-start-2 justify-self-center sm:justify-self-end text-center sm:text-right">
                             <div className="inline-block w-auto">
-                                <GoogleLoginButton className="!bg-[#0161D5] hover:!bg-[#0152b5] !text-white !font-bold !rounded-full !shadow-lg hover:!shadow-xl !p-[clamp(12px,3vw,48px)]">
+                                <GoogleLoginButton className="!bg-[#0161D5] hover:!bg-[#0152b5] !text-white !font-bold !rounded-full !shadow-lg hover:!shadow-xl !p-[clamp(12px,3vw,48px)] !text-[clamp(18px,6vw,56px)] sm:!text-[clamp(12px,3vw,56px)]">
                                     TRACK YOUR MOVEMENT
                                 </GoogleLoginButton>
                             </div>
