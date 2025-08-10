@@ -645,6 +645,13 @@
   dependencies:
     call-bind "^1.0.8"
 
+"@logdash/js-sdk@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@logdash/js-sdk/-/js-sdk-1.0.9.tgz#1b98e0c5068c1ade91a39c8988d57552a6c9cd57"
+  integrity sha512-l+omnzjlxvOwOGufVQW2+9exGBuzrFE/3mPEuV6BmCF58GWe7RaE6AERrumijEdHJ5YwmDh49YPE7I3LfXKmPg==
+  dependencies:
+    chalk "^4.1.2"
+
 "@lukeed/csprng@^1.0.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@lukeed/csprng/-/csprng-1.1.0.tgz"

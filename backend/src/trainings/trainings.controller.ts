@@ -1,3 +1,4 @@
+import { Metrics } from '@logdash/js-sdk';
 import {
     Body,
     Controller,
@@ -29,6 +30,7 @@ export class TrainingsController {
     constructor(
         private readonly trainingsReadService: TrainingsReadService,
         private readonly trainingsWriteService: TrainingsWriteService,
+        private readonly metrics: Metrics,
     ) {}
 
     @Get('trainings')
@@ -50,6 +52,7 @@ export class TrainingsController {
     @Get('public/total-kilometers')
     @ApiOperation({ summary: 'Public total kilometers across all trainings' })
     async getPublicTotalKilometers(): Promise<{ totalKilometers: number }> {
+        this.metrics.mutate('landingPageVisitsCount', 1);
         const totalKilometers = await this.trainingsReadService.getTotalDistance();
         return { totalKilometers };
     }
