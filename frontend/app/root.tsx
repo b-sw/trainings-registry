@@ -64,6 +64,8 @@ export default function App() {
 
     return (
         <GoogleOAuthProvider clientId={config.GOOGLE_OAUTH_CLIENT_ID}>
+            {/* Mount Toaster globally so it works on both Landing and authenticated screens */}
+            <Toaster position="top-right" />
             <AuthProvider>
                 <AuthWrapper>
                     <div className="flex h-screen bg-gray-50">
@@ -129,7 +131,6 @@ export default function App() {
                             </main>
                         </div>
                     </div>
-                    <Toaster position="top-right" />
                 </AuthWrapper>
             </AuthProvider>
         </GoogleOAuthProvider>
