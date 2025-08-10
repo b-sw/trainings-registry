@@ -53,6 +53,7 @@ jobs:
           jwt-secret: ${{ secrets.BACKEND_DEV_JWT_SECRET }}
           dev-auth-password: ${{ secrets.BACKEND_DEV_AUTH_PASSWORD }}
           is-dev-environment: false
+          logdash-api-key: ${{ secrets.LOGDASH_PROD_API_KEY }}
       - name: Prune
         uses: "./.github/templates/prune"
         with:
