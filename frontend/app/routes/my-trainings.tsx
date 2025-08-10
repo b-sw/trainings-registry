@@ -146,7 +146,14 @@ export default function MyTrainings() {
                 activityType: newActivity.type,
             };
 
-            await trainingApi.create(trainingData);
+            const createdTraining = await trainingApi.create(trainingData);
+            const createdActivity = mapTrainingToActivity(createdTraining);
+
+            // Optimistically prepend the new activity without reloading
+            setActivities((prev) => [createdActivity, ...prev]);
+            toast.success(
+                `Added ${createdActivity.type.charAt(0).toUpperCase() + createdActivity.type.slice(1)} ${createdActivity.distance} km`,
+            );
 
             // Reset form and close
             setNewActivity({
@@ -158,10 +165,7 @@ export default function MyTrainings() {
             });
             setShowAddForm(false);
 
-            // Reload activities from the beginning
-            setSkip(0);
-            setHasMore(true);
-            await loadActivities(0, false);
+            // Do not reload list; keep pagination state intact
         } catch (err) {
             console.error('Failed to create activity:', err);
 
