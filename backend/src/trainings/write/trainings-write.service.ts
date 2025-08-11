@@ -72,7 +72,7 @@ export class TrainingsWriteService {
             updateQuery.date = trainingDate as any;
         }
 
-        if (dto.distance) {
+        if (dto.distance !== undefined) {
             updateQuery.distance = dto.distance as any;
         }
 
@@ -82,6 +82,7 @@ export class TrainingsWriteService {
 
         const entity = await this.trainingModel.findByIdAndUpdate(trainingId, updateQuery, {
             new: true,
+            runValidators: true,
         });
 
         if (!entity) {

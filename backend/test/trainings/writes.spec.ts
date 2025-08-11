@@ -142,6 +142,50 @@ describe('TrainingsController (writes)', () => {
             // then
             expect(response.status).toBe(401);
         });
+
+        it('returns 400 when distance is below 0 on create', async () => {
+            // given
+            const user = await bootstrap.utils.userUtils.createDefaultUser();
+            const token = bootstrap.utils.authUtils.generateToken(user);
+            const createTrainingDto = {
+                userId: user.id,
+                description: 'Too small distance',
+                date: new Date('2025-01-15T00:00:00.000Z').toISOString(),
+                distance: -1,
+                activityType: ActivityType.Running,
+            };
+
+            // when
+            const response = await request(bootstrap.app.getHttpServer())
+                .post('/trainings')
+                .set('Authorization', `Bearer ${token}`)
+                .send(createTrainingDto);
+
+            // then
+            expect(response.status).toBe(400);
+        });
+
+        it('returns 400 when distance is above 999 on create', async () => {
+            // given
+            const user = await bootstrap.utils.userUtils.createDefaultUser();
+            const token = bootstrap.utils.authUtils.generateToken(user);
+            const createTrainingDto = {
+                userId: user.id,
+                description: 'Too large distance',
+                date: new Date('2025-01-15T00:00:00.000Z').toISOString(),
+                distance: 1000,
+                activityType: ActivityType.Running,
+            };
+
+            // when
+            const response = await request(bootstrap.app.getHttpServer())
+                .post('/trainings')
+                .set('Authorization', `Bearer ${token}`)
+                .send(createTrainingDto);
+
+            // then
+            expect(response.status).toBe(400);
+        });
     });
 
     describe('PUT /trainings/:trainingId', () => {
@@ -210,6 +254,54 @@ describe('TrainingsController (writes)', () => {
 
             // then
             expect(response.status).toBe(403);
+        });
+
+        it('returns 400 when distance is below 0 on update', async () => {
+            // given
+            const user = await bootstrap.utils.userUtils.createDefaultUser();
+            const adminUser = await bootstrap.utils.userUtils.createAdminUser();
+            const token = bootstrap.utils.authUtils.generateToken(adminUser);
+            const training = await bootstrap.utils.trainingUtils.createTraining({
+                userId: user.id,
+                distance: 5.0,
+            });
+
+            const updateTrainingDto = {
+                distance: -5,
+            };
+
+            // when
+            const response = await request(bootstrap.app.getHttpServer())
+                .put(`/trainings/${training.id}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send(updateTrainingDto);
+
+            // then
+            expect(response.status).toBe(400);
+        });
+
+        it('returns 400 when distance is above 999 on update', async () => {
+            // given
+            const user = await bootstrap.utils.userUtils.createDefaultUser();
+            const adminUser = await bootstrap.utils.userUtils.createAdminUser();
+            const token = bootstrap.utils.authUtils.generateToken(adminUser);
+            const training = await bootstrap.utils.trainingUtils.createTraining({
+                userId: user.id,
+                distance: 5.0,
+            });
+
+            const updateTrainingDto = {
+                distance: 1000,
+            };
+
+            // when
+            const response = await request(bootstrap.app.getHttpServer())
+                .put(`/trainings/${training.id}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send(updateTrainingDto);
+
+            // then
+            expect(response.status).toBe(400);
         });
     });
 
