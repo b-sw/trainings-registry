@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router';
+import { config } from '~/config/env';
 import { Tooltip } from '../components/Tooltip';
 import type { Activity } from '../utils/api';
 import { mapTrainingToActivity, trainingApi } from '../utils/api';
@@ -29,7 +30,7 @@ export default function MyTrainings() {
         notes: '',
     });
 
-    const eventStarted = hasEventStartedCET();
+    const eventStarted = hasEventStartedCET() || config.IS_DEV_ENV;
 
     const openAddForm = () => {
         setShowAddForm(true);
@@ -159,6 +160,12 @@ export default function MyTrainings() {
         if (!user?.id) return;
 
         try {
+            // Guard: distance must be between 0 and 999
+            if (newActivity.distance < 0 || newActivity.distance > 999) {
+                toast.error('Distance must be between 0 and 999.');
+                return;
+            }
+
             // Map frontend activity format to backend training format
             const trainingData = {
                 userId: user.id,
@@ -401,11 +408,18 @@ export default function MyTrainings() {
                                         type="number"
                                         step="0.1"
                                         min="0"
+                                        max="999"
                                         value={newActivity.distance || ''}
                                         onChange={(e) =>
                                             handleInputChange(
                                                 'distance',
-                                                parseFloat(e.target.value) || 0,
+                                                (() => {
+                                                    const parsed = parseFloat(e.target.value);
+                                                    if (Number.isNaN(parsed)) return 0;
+                                                    if (parsed < 0) return 0;
+                                                    if (parsed > 999) return 999;
+                                                    return parsed;
+                                                })(),
                                             )
                                         }
                                         className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0161D5] focus:border-transparent"

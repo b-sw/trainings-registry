@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsIn, IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
+import {
+    IsDateString,
+    IsIn,
+    IsNotEmpty,
+    IsNumber,
+    IsPositive,
+    IsString,
+    Max,
+    Min,
+} from 'class-validator';
 import { ActivityType } from '../../entities/training.entity';
 
 export class CreateTrainingDto {
@@ -17,9 +26,11 @@ export class CreateTrainingDto {
     @IsDateString()
     date: string;
 
-    @ApiProperty()
+    @ApiProperty({ minimum: 0, maximum: 999, exclusiveMaximum: true })
     @IsNumber()
     @IsPositive()
+    @Min(0)
+    @Max(999)
     distance: number;
 
     @ApiProperty({ enum: ActivityType })

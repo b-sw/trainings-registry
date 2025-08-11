@@ -168,7 +168,7 @@ export default function Standings() {
                             TOP PERFORMERS
                         </h1>
                         <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-600">
-                            See how you rank against other team members in various activities.
+                            See how you rank against other participants in various activities.
                         </p>
                     </div>
                     {eventStarted ? (
@@ -297,7 +297,7 @@ export default function Standings() {
                                 No activities found
                             </h3>
                             <p className="text-gray-500">
-                                No activities recorded for the selected date range.
+                                No activities added for the event yet.
                             </p>
                         </div>
                     ) : (

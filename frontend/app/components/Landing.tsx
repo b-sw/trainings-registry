@@ -32,7 +32,7 @@ export function Landing() {
                     {/* Left side - Main text */}
                     <div className="hidden sm:flex flex-col leading-none">
                         <h1
-                            className="font-black text-blue-600"
+                            className="font-black text-[#0161D5]"
                             style={{
                                 fontFamily: 'Oswald, sans-serif',
                                 fontSize: 'clamp(48px, 12vw, 208px)',

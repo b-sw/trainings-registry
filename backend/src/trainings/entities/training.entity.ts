@@ -20,7 +20,13 @@ export class TrainingEntity {
     @Prop({ required: true })
     date: Date;
 
-    @Prop({ required: true })
+    @Prop({
+        required: true,
+        validate: {
+            validator: (value: number) => value >= 0 && value <= 999,
+            message: 'Distance must be >= 0 and <= 999',
+        },
+    })
     distance: number;
 
     @Prop({ required: true, enum: ActivityType })
