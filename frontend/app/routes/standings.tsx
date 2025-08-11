@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { config } from '~/config/env';
 import { Tooltip } from '../components/Tooltip';
-import { config } from '../config/env';
 import type { UserSerialized } from '../utils/api';
 import { trainingApi, userApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
+import { hasEventStartedCET } from '../utils/event';
 
 interface User {
     rank: number;
@@ -27,7 +28,7 @@ export default function Standings() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const isDevEnv = config.IS_DEV_ENV;
+    const eventStarted = hasEventStartedCET() || config.IS_DEV_ENV;
 
     // Load standings data
     useEffect(() => {
@@ -172,7 +173,7 @@ export default function Standings() {
                             See how you rank against other team members in various activities.
                         </p>
                     </div>
-                    {isDevEnv ? (
+                    {eventStarted ? (
                         <button
                             onClick={() => (window.location.href = '/my-trainings?add=true')}
                             className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
@@ -181,7 +182,7 @@ export default function Standings() {
                             ADD ACTIVITY
                         </button>
                     ) : (
-                        <Tooltip label="The event has not started yet">
+                        <Tooltip label="The event will start on 12th of August">
                             <button
                                 onClick={() => undefined}
                                 disabled
