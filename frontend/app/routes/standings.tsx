@@ -4,7 +4,7 @@ import { Tooltip } from '../components/Tooltip';
 import type { UserSerialized } from '../utils/api';
 import { trainingApi, userApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
-import { hasEventStartedCET } from '../utils/event';
+import { EVENT_START_DATE_MONTH, hasEventStartedCET } from '../utils/event';
 
 interface User {
     rank: number;
@@ -38,9 +38,7 @@ export default function Standings() {
                 setError(null);
 
                 // Fixed date range: start of year to today
-                const startDate = new Date(new Date().getFullYear(), 0, 1)
-                    .toISOString()
-                    .split('T')[0];
+                const startDate = EVENT_START_DATE_MONTH.toISOString().split('T')[0];
                 const endDate = new Date().toISOString().split('T')[0];
 
                 // Fetch all users and their activities

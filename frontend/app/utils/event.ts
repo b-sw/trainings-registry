@@ -1,4 +1,6 @@
 export function hasEventStartedCET(now: Date = new Date()): boolean {
-    const eventDate = new Date('2025-08-12T00:00:00+02:00');
-    return now.getTime() >= eventDate.getTime();
+    return now.getTime() >= EVENT_START_DATE.getTime();
 }
+
+export const EVENT_START_DATE = new Date('2025-08-11T00:00:00+02:00');
+export const EVENT_START_DATE_MONTH = new Date('2025-08-01T00:00:00+02:00');
