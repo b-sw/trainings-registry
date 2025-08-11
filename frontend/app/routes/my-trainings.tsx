@@ -3,10 +3,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router';
 import { Tooltip } from '../components/Tooltip';
-import { config } from '../config/env';
 import type { Activity } from '../utils/api';
 import { mapTrainingToActivity, trainingApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
+import { hasEventStartedCET } from '../utils/event';
 
 export default function MyTrainings() {
     const { user } = useAuth();
@@ -14,7 +14,7 @@ export default function MyTrainings() {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [showAddForm, setShowAddForm] = useState(() => searchParams.get('add') === 'true');
     const [hasMore, setHasMore] = useState(true);
     const [skip, setSkip] = useState(0);
@@ -29,7 +29,25 @@ export default function MyTrainings() {
         notes: '',
     });
 
-    const isDevEnv = config.IS_DEV_ENV;
+    const eventStarted = hasEventStartedCET();
+
+    const openAddForm = () => {
+        setShowAddForm(true);
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('add', 'true');
+            return next;
+        });
+    };
+
+    const closeAddForm = () => {
+        setShowAddForm(false);
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.delete('add');
+            return next;
+        });
+    };
 
     // Load activities with pagination
     const loadActivities = useCallback(
@@ -167,7 +185,7 @@ export default function MyTrainings() {
                 date: new Date().toISOString().split('T')[0],
                 notes: '',
             });
-            setShowAddForm(false);
+            closeAddForm();
 
             // Do not reload list; keep pagination state intact
         } catch (err) {
@@ -261,16 +279,16 @@ export default function MyTrainings() {
                             Track your fitness journey and see your progress over time.
                         </p>
                     </div>
-                    {isDevEnv ? (
+                    {eventStarted ? (
                         <button
-                            onClick={() => setShowAddForm(!showAddForm)}
+                            onClick={() => (showAddForm ? closeAddForm() : openAddForm())}
                             className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                         >
                             <span className="mr-2">+</span>
                             {showAddForm ? 'CANCEL' : 'ADD ACTIVITY'}
                         </button>
                     ) : (
-                        <Tooltip label="The event has not started yet">
+                        <Tooltip label="The event will start on 12th of August">
                             <button
                                 onClick={() => undefined}
                                 disabled
@@ -284,7 +302,9 @@ export default function MyTrainings() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8 flex-shrink-0">
+                <div
+                    className={`${showAddForm ? 'hidden sm:grid' : 'grid'} grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8 flex-shrink-0`}
+                >
                     <div className="bg-white rounded-lg shadow p-4 md:p-6">
                         <div className="flex items-center">
                             <div className="p-1.5 md:p-2 bg-indigo-100 rounded-lg">
@@ -424,7 +444,7 @@ export default function MyTrainings() {
                             <div className="flex justify-end space-x-3">
                                 <button
                                     type="button"
-                                    onClick={() => setShowAddForm(false)}
+                                    onClick={closeAddForm}
                                     className="font-oswald px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-md text-sm md:text-md font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                                 >
                                     CANCEL
@@ -441,26 +461,40 @@ export default function MyTrainings() {
                 )}
 
                 {/* Activities List */}
-                <div className="bg-white rounded-lg shadow flex-1 flex flex-col min-h-0">
+                <div
+                    className={`bg-white rounded-lg shadow flex-1 ${showAddForm ? 'hidden sm:flex' : 'flex'} flex-col min-h-0`}
+                >
                     <div className="px-6 py-4 border-b border-gray-200">
                         <h3 className="text-lg font-medium text-gray-900">Recent Activities</h3>
                     </div>
 
                     {activities.length === 0 && !showAddForm ? (
-                        <div className="px-6 py-12 text-center">
+                        <div className="px-6 py-6 sm:py-12 text-center">
                             <span className="text-6xl mb-4 block">🚶‍♂️</span>
                             <h3 className="text-lg font-medium text-gray-900 mb-2">
                                 No activities yet
                             </h3>
-                            <p className="text-gray-500 mb-4">
+                            <p className="hidden sm:block text-gray-500 mb-4">
                                 Start tracking your fitness journey by adding your first activity.
                             </p>
-                            <button
-                                onClick={() => setShowAddForm(true)}
-                                className="font-oswald inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-lg font-medium text-white hover:bg-blue-700"
-                            >
-                                + ADD YOUR FIRST ACTIVITY
-                            </button>
+                            {eventStarted ? (
+                                <button
+                                    onClick={openAddForm}
+                                    className="font-oswald inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-lg font-medium text-white hover:bg-blue-700"
+                                >
+                                    + ADD YOUR FIRST ACTIVITY
+                                </button>
+                            ) : (
+                                <Tooltip label="The event will start on 12th of August">
+                                    <button
+                                        onClick={() => undefined}
+                                        disabled
+                                        className="font-oswald inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-lg font-medium text-white opacity-50 cursor-not-allowed"
+                                    >
+                                        + ADD YOUR FIRST ACTIVITY
+                                    </button>
+                                </Tooltip>
+                            )}
                         </div>
                     ) : (
                         <div className="overflow-y-auto flex-1 min-h-0 scrollbar-custom">
