@@ -162,36 +162,38 @@ export default function Standings() {
         <div className="bg-gray-50 min-h-[calc(100vh-0px)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col h-[calc(100vh-64px)]">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6 md:mb-8">
-                    <div>
+                <div className="grid grid-cols-5 gap-3 items-end md:flex md:items-center md:justify-between mb-2 md:mb-2">
+                    <div className="col-span-3">
                         <h1 className="text-2xl md:text-3xl font-oswald font-bold text-gray-900">
                             TOP PERFORMERS
                         </h1>
-                        <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-600">
-                            See how you rank against other participants in various activities.
-                        </p>
                     </div>
-                    {eventStarted ? (
-                        <button
-                            onClick={() => (window.location.href = '/my-trainings?add=true')}
-                            className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
-                        >
-                            <span className="mr-2">+</span>
-                            ADD ACTIVITY
-                        </button>
-                    ) : (
-                        <Tooltip label="The event will start on 12th of August">
+                    <div className="col-span-2 flex justify-end">
+                        {eventStarted ? (
                             <button
-                                onClick={() => undefined}
-                                disabled
-                                className="font-oswald inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white opacity-50 cursor-not-allowed"
+                                onClick={() => (window.location.href = '/my-trainings?add=true')}
+                                className="font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                             >
                                 <span className="mr-2">+</span>
                                 ADD ACTIVITY
                             </button>
-                        </Tooltip>
-                    )}
+                        ) : (
+                            <Tooltip label="The event will start on 12th of August">
+                                <button
+                                    onClick={() => undefined}
+                                    disabled
+                                    className="font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white opacity-50 cursor-not-allowed"
+                                >
+                                    <span className="mr-2">+</span>
+                                    ADD ACTIVITY
+                                </button>
+                            </Tooltip>
+                        )}
+                    </div>
                 </div>
+                <p className="mt-1 md:mt-2 mb-6 md:mb-8 text-sm md:text-base text-gray-600">
+                    See how you rank against other participants in various activities.
+                </p>
 
                 {/* User Summary Cards */}
                 {currentUserData && (
@@ -296,9 +298,7 @@ export default function Standings() {
                             <h3 className="text-lg font-medium text-gray-900 mb-2">
                                 No activities found
                             </h3>
-                            <p className="text-gray-500">
-                                No activities added for the event yet.
-                            </p>
+                            <p className="text-gray-500">No activities added for the event yet.</p>
                         </div>
                     ) : (
                         <div className="divide-y divide-gray-200 overflow-y-auto flex-1 min-h-0 scrollbar-custom">
