@@ -21,13 +21,90 @@ export function Landing() {
             isMounted = false;
         };
     }, []);
+
     return (
         <div
-            className="min-h-screen flex flex-col justify-center relative gap-8"
+            className="h-screen overflow-hidden flex flex-col justify-center relative gap-8"
             style={{ backgroundColor: '#ffec3d', fontFamily: 'Oswald, sans-serif' }}
         >
-            {/* Main row: left and right columns */}
-            <div className="flex flex-col">
+            {/* Mobile poster-style layout */}
+            <div className="sm:hidden px-6 py-10 overflow-hidden">
+                <div className="relative">
+                    <h1
+                        className="font-black text-[#0161D5] leading-none pr-[28%]"
+                        style={{ fontSize: 'clamp(48px, 18vw, 96px)' }}
+                    >
+                        MOVE
+                        <br />
+                        FOR
+                        <br />
+                        UKRAINE
+                    </h1>
+                    <img
+                        src={movingSvg}
+                        alt="Person running"
+                        className="absolute right-0 -top-3 w-[60%] max-w-[320px] pointer-events-none select-none"
+                    />
+                </div>
+
+                <div
+                    className="font-black text-black mt-4"
+                    style={{ fontSize: 'clamp(28px, 12vw, 64px)', lineHeight: 1.05 }}
+                >
+                    AUGUST 12-26
+                </div>
+
+                <p
+                    className="mt-6 text-black font-semibold uppercase"
+                    style={{ fontSize: 'clamp(12px, 3.8vw, 20px)' }}
+                >
+                    <span className="font-bold" style={{ color: '#0161D5' }}>
+                        Box.org
+                    </span>{' '}
+                    will make a donation to the{' '}
+                    <span className="font-bold" style={{ color: '#0161D5' }}>
+                        Rehabilitation Center
+                    </span>{' '}
+                    <a
+                        href="https://superhumans.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-bold underline"
+                        style={{ color: '#0161D5' }}
+                    >
+                        Superhumans
+                    </a>{' '}
+                    for every kilometer you move!
+                </p>
+
+                <p
+                    className="mt-8 font-black text-black"
+                    style={{ fontSize: 'clamp(14px, 5vw, 22px)' }}
+                >
+                    As of {today}, we’ve moved for{' '}
+                    <span className="text-[#0161D5] font-bold">
+                        {totalKilometers !== null ? `${totalKilometers}km` : '...'}
+                    </span>
+                    !
+                </p>
+
+                <div className="mt-8">
+                    <GoogleLoginButton className="!bg-[#0161D5] hover:!bg-[#0152b5] !text-white !font-bold !rounded-full !shadow-lg hover:!shadow-xl !px-6 !py-5 !text-[clamp(18px,6vw,28px)] w-full">
+                        TRACK YOUR MOVEMENT
+                    </GoogleLoginButton>
+                </div>
+
+                <p
+                    className="mt-8 text-black font-semibold whitespace-nowrap text-center w-full"
+                    style={{ fontSize: 'clamp(12px, 3.4vw, 15px)' }}
+                >
+                    Share your achievements at{' '}
+                    <span className="text-[#0161D5] font-bold">#move-for-ukraine</span>
+                </p>
+            </div>
+
+            {/* Main row: left and right columns (desktop/tablet) */}
+            <div className="hidden sm:flex flex-col">
                 <div className="flex justify-center gap-24">
                     {/* Left side - Main text */}
                     <div className="hidden sm:flex flex-col leading-none">
@@ -94,7 +171,7 @@ export function Landing() {
             </div>
 
             {/* Bottom bar - Left and right blocks together (in flow) */}
-            <div className="flex flex-col">
+            <div className="hidden sm:flex flex-col">
                 <div className="hidden sm:flex justify-center items-center gap-24">
                     <div
                         className="font-black text-black"
@@ -124,8 +201,8 @@ export function Landing() {
                 </div>
             </div>
 
-            {/* Middle - SVG illustration (top half) */}
-            <div className="absolute left-1/2 top-1/4 sm:top-0 items-center justify-center transform -translate-x-1/2 scale-90">
+            {/* Middle - SVG illustration (desktop positioning) */}
+            <div className="hidden sm:flex absolute left-1/2 top-1/4 sm:top-0 items-center justify-center transform -translate-x-1/2 scale-90">
                 <img
                     src={movingSvg}
                     alt="Person running"
