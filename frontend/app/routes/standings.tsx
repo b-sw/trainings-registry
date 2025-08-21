@@ -199,8 +199,8 @@ export default function Standings() {
     ];
 
     return (
-        <div className="bg-gray-50 min-h-[calc(100vh-0px)]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex flex-col h-[calc(100vh-64px)]">
+        <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex flex-col min-h-0">
                 {/* Header */}
                 <div className="grid grid-cols-5 gap-3 items-end md:flex md:items-center md:justify-between mb-2 md:mb-2">
                     <div className="col-span-3">
