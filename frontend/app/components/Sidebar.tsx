@@ -12,14 +12,14 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
     const navigation = [
         {
-            name: 'My activities',
-            href: '/my-trainings',
-            icon: '💪',
+            name: 'Community Impact',
+            href: '/community-impact',
+            icon: '🏆',
         },
         {
-            name: 'Top performers',
-            href: '/standings',
-            icon: '🏆',
+            name: 'My activities',
+            href: '/my-activities',
+            icon: '💪',
         },
         {
             name: 'About',
@@ -33,7 +33,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             {/* Logo/Brand */}
             <div className="flex items-center px-6 py-4 border-b border-gray-200">
                 <Link
-                    to="/my-trainings"
+                    to="/my-activities"
                     className="flex items-center space-x-3"
                     onClick={onNavigate}
                 >

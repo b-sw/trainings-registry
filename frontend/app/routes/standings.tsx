@@ -24,11 +24,26 @@ type ActivityTab = 'all' | 'cycling' | 'running' | 'walking';
 
 export default function Standings() {
     const { user: currentUser } = useAuth();
-    const [activeTab, setActiveTab] = useState<ActivityTab>('all');
+    const [activeTab, setActiveTab] = useState<ActivityTab>('cycling');
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const eventStarted = hasEventStartedCET() || config.IS_DEV_ENV;
+    const [teamTotals, setTeamTotals] = useState<{
+        total: number;
+        cycling: number;
+        running: number;
+        walking: number;
+    }>({ total: 0, cycling: 0, running: 0, walking: 0 });
+
+    const formatKm = (value: number) => `${Math.round(value).toLocaleString()} km`;
+
+    // On larger screens (>=640px), show All Activities by default
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.matchMedia('(min-width: 640px)').matches) {
+            setActiveTab('all');
+        }
+    }, []);
 
     // Load standings data
     useEffect(() => {
@@ -81,6 +96,28 @@ export default function Standings() {
                     user.rank = index + 1;
                 });
 
+                // Compute team totals for tiles
+                const totals = userActivities.reduce(
+                    (acc, a) => {
+                        acc.cycling += a.cyclingDistance || 0;
+                        acc.running += a.runningDistance || 0;
+                        acc.walking += a.walkingDistance || 0;
+                        return acc;
+                    },
+                    { cycling: 0, running: 0, walking: 0 } as {
+                        cycling: number;
+                        running: number;
+                        walking: number;
+                    },
+                );
+                const total = totals.cycling + totals.running + totals.walking;
+                setTeamTotals({
+                    total,
+                    cycling: totals.cycling,
+                    running: totals.running,
+                    walking: totals.walking,
+                });
+
                 setUsers(sortedUsers);
             } catch (err) {
                 console.error('Failed to load standings:', err);
@@ -93,10 +130,6 @@ export default function Standings() {
         loadStandings();
     }, [currentUser?.id]);
 
-    // Get current user data
-    const currentUserData = users.find((user) => user.isCurrentUser);
-
-    // Calculate rankings by category
     const getRankingByCategory = (category: ActivityTab) => {
         if (category === 'all') return users;
 
@@ -158,20 +191,27 @@ export default function Standings() {
         );
     }
 
+    const tabs = [
+        { key: 'all' as const, label: 'All Activities', icon: '🏆' },
+        { key: 'cycling' as const, label: 'Cycling', icon: '🚴‍♂️' },
+        { key: 'running' as const, label: 'Running', icon: '🏃‍♂️' },
+        { key: 'walking' as const, label: 'Walking', icon: '🚶‍♂️' },
+    ];
+
     return (
         <div className="bg-gray-50 min-h-[calc(100vh-0px)]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col h-[calc(100vh-64px)]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex flex-col h-[calc(100vh-64px)]">
                 {/* Header */}
                 <div className="grid grid-cols-5 gap-3 items-end md:flex md:items-center md:justify-between mb-2 md:mb-2">
                     <div className="col-span-3">
                         <h1 className="text-2xl md:text-3xl font-oswald font-bold text-gray-900">
-                            TOP PERFORMERS
+                            COMMUNITY IMPACT
                         </h1>
                     </div>
                     <div className="col-span-2 flex justify-end">
                         {eventStarted ? (
                             <button
-                                onClick={() => (window.location.href = '/my-trainings?add=true')}
+                                onClick={() => (window.location.href = '/my-activities?add=true')}
                                 className="font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
                             >
                                 <span className="mr-2">+</span>
@@ -195,101 +235,68 @@ export default function Standings() {
                     See how you rank against other participants in various activities.
                 </p>
 
-                {/* User Summary Cards */}
-                {currentUserData && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8 flex-shrink-0">
-                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                            <h3 className="text-sm font-medium text-gray-600 mb-1">
-                                🏆 Overall Rank
-                            </h3>
-                            <div className="text-xl md:text-2xl font-oswald font-bold text-[#0161D5]">
-                                #{currentUserData.rank}
-                            </div>
-                            <p className="text-gray-600 text-sm">
-                                {currentUserData.totalDistance.toFixed(1)} km total
-                            </p>
+                {/* Team Summary Tiles styled like the image */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8 flex-shrink-0">
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                        <div className="text-xs md:text-sm font-medium text-gray-500 flex items-center gap-2">
+                            <span>🏆</span>
+                            <span>Overall Moved</span>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                            <h3 className="text-sm font-medium text-gray-600 mb-1">
-                                🚴‍♂️ Cycling Rank
-                            </h3>
-                            <div className="text-xl md:text-2xl font-oswald font-bold text-[#0161D5]">
-                                #
-                                {getRankingByCategory('cycling').findIndex(
-                                    (user) => user.isCurrentUser,
-                                ) + 1}
-                            </div>
-                            <p className="text-gray-600 text-sm">
-                                {currentUserData.cyclingDistance.toFixed(1)} km
-                            </p>
-                        </div>
-                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                            <h3 className="text-sm font-medium text-gray-600 mb-1">
-                                🏃‍♂️ Running Rank
-                            </h3>
-                            <div className="text-xl md:text-2xl font-oswald font-bold text-green-600">
-                                #
-                                {getRankingByCategory('running').findIndex(
-                                    (user) => user.isCurrentUser,
-                                ) + 1}
-                            </div>
-                            <p className="text-gray-600 text-sm">
-                                {currentUserData.runningDistance.toFixed(1)} km
-                            </p>
-                        </div>
-                        <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                            <h3 className="text-sm font-medium text-gray-600 mb-1">
-                                🚶‍♂️ Walking Rank
-                            </h3>
-                            <div className="text-xl md:text-2xl font-oswald font-bold text-yellow-600">
-                                #
-                                {getRankingByCategory('walking').findIndex(
-                                    (user) => user.isCurrentUser,
-                                ) + 1}
-                            </div>
-                            <p className="text-gray-600 text-sm">
-                                {currentUserData.walkingDistance.toFixed(1)} km
-                            </p>
+                        <div className="mt-1 text-xl md:text-2xl font-oswald font-bold text-[#0161D5]">
+                            {formatKm(teamTotals.total)}
                         </div>
                     </div>
-                )}
 
-                {/* Activity Tabs - hide on mobile to save space */}
-                <div className="bg-white rounded-lg shadow mb-6 flex-shrink-0 hidden md:block">
-                    <div className="border-b border-gray-200">
-                        <nav className="flex space-x-8 px-6">
-                            {[
-                                { key: 'all' as const, label: 'All Activities', icon: '🏆' },
-                                { key: 'cycling' as const, label: 'Cycling', icon: '🚴‍♂️' },
-                                { key: 'running' as const, label: 'Running', icon: '🏃‍♂️' },
-                                { key: 'walking' as const, label: 'Walking', icon: '🚶‍♂️' },
-                            ].map((tab) => (
-                                <button
-                                    key={tab.key}
-                                    onClick={() => setActiveTab(tab.key)}
-                                    className={`no-rounded flex items-center space-x-2 py-4 border-b-2 font-medium text-sm ${
-                                        activeTab === tab.key
-                                            ? 'border-[#0161D5] text-[#0161D5]'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    }`}
-                                >
-                                    <span>{tab.icon}</span>
-                                    <span>{tab.label}</span>
-                                </button>
-                            ))}
-                        </nav>
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                        <div className="text-xs md:text-sm font-medium text-gray-500 flex items-center gap-2">
+                            <span>🚴‍♂️</span>
+                            <span>Cycling</span>
+                        </div>
+                        <div className="mt-1 text-xl md:text-2xl font-oswald font-bold text-purple-600">
+                            {formatKm(teamTotals.cycling)}
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                        <div className="text-xs md:text-sm font-medium text-gray-500 flex items-center gap-2">
+                            <span>🏃‍♂️</span>
+                            <span>Running</span>
+                        </div>
+                        <div className="mt-1 text-xl md:text-2xl font-oswald font-bold text-green-600">
+                            {formatKm(teamTotals.running)}
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                        <div className="text-xs md:text-sm font-medium text-gray-500 flex items-center gap-2">
+                            <span>🚶‍♂️</span>
+                            <span>Walking</span>
+                        </div>
+                        <div className="mt-1 text-xl md:text-2xl font-oswald font-bold text-amber-600">
+                            {formatKm(teamTotals.walking)}
+                        </div>
                     </div>
                 </div>
 
                 {/* Leaderboard */}
                 <div className="bg-white rounded-lg shadow flex-1 flex flex-col min-h-0">
                     <div className="px-6 py-4 border-b border-gray-200">
-                        <h3 className="text-lg font-medium text-gray-900">
-                            {activeTab === 'all'
-                                ? 'Overall'
-                                : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}{' '}
-                            Rankings
-                        </h3>
+                        <nav className="flex flex-wrap gap-4">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.key}
+                                    onClick={() => setActiveTab(tab.key)}
+                                    className={`no-rounded flex items-center space-x-2 pb-1 border-b-2 font-medium text-sm ${
+                                        activeTab === tab.key
+                                            ? 'border-[#0161D5] text-[#0161D5]'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    } ${tab.key === 'all' ? 'hidden sm:flex' : ''}`}
+                                >
+                                    <span>{tab.icon}</span>
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
+                        </nav>
                     </div>
 
                     {displayUsers.length === 0 ? (
@@ -347,7 +354,7 @@ export default function Standings() {
                                                     <span>{user.activitiesCount} activities</span>
                                                     <span>•</span>
                                                     <span>
-                                                        Avg:{' '}
+                                                        Avg{' '}
                                                         {user.activitiesCount > 0
                                                             ? (
                                                                   getDistanceForTab(
