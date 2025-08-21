@@ -111,7 +111,7 @@ export default function App() {
                                         />
                                     </svg>
                                 </button>
-                                <Link to="/my-trainings" className="flex items-center space-x-3">
+                                <Link to="/my-activities" className="flex items-center space-x-3">
                                     <img
                                         src={logo}
                                         alt="Move for Ukraine logo"

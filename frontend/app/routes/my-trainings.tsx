@@ -7,7 +7,7 @@ import { Tooltip } from '../components/Tooltip';
 import type { Activity } from '../utils/api';
 import { mapTrainingToActivity, trainingApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
-import { hasEventStartedCET } from '../utils/event';
+import { EVENT_START_DATE_MONTH, hasEventStartedCET } from '../utils/event';
 
 export default function MyTrainings() {
     const { user } = useAuth();
@@ -28,6 +28,26 @@ export default function MyTrainings() {
         duration: 0,
         date: new Date().toISOString().split('T')[0],
         notes: '',
+    });
+
+    const [summary, setSummary] = useState<{
+        overallRank: number | null;
+        cyclingRank: number | null;
+        runningRank: number | null;
+        walkingRank: number | null;
+        cyclingDistance: number;
+        runningDistance: number;
+        walkingDistance: number;
+        totalDistance: number;
+    }>({
+        overallRank: null,
+        cyclingRank: null,
+        runningRank: null,
+        walkingRank: null,
+        cyclingDistance: 0,
+        runningDistance: 0,
+        walkingDistance: 0,
+        totalDistance: 0,
     });
 
     const eventStarted = hasEventStartedCET() || config.IS_DEV_ENV;
@@ -100,6 +120,59 @@ export default function MyTrainings() {
     useEffect(() => {
         loadActivities(0, false);
     }, [loadActivities]);
+
+    useEffect(() => {
+        const loadSummary = async () => {
+            if (!user?.id) return;
+            try {
+                const startDate = EVENT_START_DATE_MONTH.toISOString().split('T')[0];
+                const endDate = new Date().toISOString().split('T')[0];
+                const allUsersActivities = await trainingApi.getAllUsersActivities(
+                    startDate,
+                    endDate,
+                );
+
+                const withTotals = allUsersActivities.map((a) => ({
+                    ...a,
+                    totalDistance:
+                        (a.runningDistance || 0) +
+                        (a.cyclingDistance || 0) +
+                        (a.walkingDistance || 0),
+                }));
+
+                const sortBy = (
+                    key:
+                        | 'totalDistance'
+                        | 'cyclingDistance'
+                        | 'runningDistance'
+                        | 'walkingDistance',
+                ) =>
+                    [...withTotals]
+                        .sort((a, b) => (b as any)[key] - (a as any)[key])
+                        .findIndex((a) => a.userId === user.id) + 1;
+
+                const current = withTotals.find((a) => a.userId === user.id);
+
+                setSummary({
+                    overallRank: withTotals.length ? sortBy('totalDistance') : null,
+                    cyclingRank: withTotals.length ? sortBy('cyclingDistance') : null,
+                    runningRank: withTotals.length ? sortBy('runningDistance') : null,
+                    walkingRank: withTotals.length ? sortBy('walkingDistance') : null,
+                    cyclingDistance: current?.cyclingDistance || 0,
+                    runningDistance: current?.runningDistance || 0,
+                    walkingDistance: current?.walkingDistance || 0,
+                    totalDistance:
+                        current?.totalDistance ||
+                        (current?.runningDistance || 0) +
+                            (current?.cyclingDistance || 0) +
+                            (current?.walkingDistance || 0),
+                });
+            } catch (e) {
+                console.error('Failed to load ranking summary', e);
+            }
+        };
+        loadSummary();
+    }, [user?.id]);
 
     // Intersection Observer for infinite scroll
     useEffect(() => {
@@ -275,7 +348,7 @@ export default function MyTrainings() {
 
     return (
         <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col min-h-0">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex-1 flex flex-col min-h-0">
                 {/* Header */}
                 <div className="grid grid-cols-5 gap-3 items-end md:flex md:items-center md:justify-between mb-2 md:mb-2 flex-shrink-0">
                     <div className="col-span-3">
@@ -312,70 +385,46 @@ export default function MyTrainings() {
 
                 {/* Stats Cards */}
                 <div
-                    className={`${showAddForm ? 'hidden sm:grid' : 'grid'} grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8 flex-shrink-0`}
+                    className={`${showAddForm ? 'hidden sm:grid' : 'grid'} grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8 flex-shrink-0`}
                 >
                     <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                        <div className="flex items-center">
-                            <div className="p-1.5 md:p-2 bg-indigo-100 rounded-lg">
-                                <span className="text-xl md:text-2xl">🎯</span>
-                            </div>
-                            <div className="ml-3 md:ml-4">
-                                <h3 className="text-xs md:text-sm font-medium text-gray-500 whitespace-nowrap">
-                                    Total Distance
-                                </h3>
-                                <p className="text-xl md:text-2xl font-oswald font-bold text-gray-900 whitespace-nowrap">
-                                    {totalDistance.toFixed(1)} KM
-                                </p>
-                            </div>
+                        <h3 className="text-sm font-medium text-gray-600 mb-1">🏆 Overall Rank</h3>
+                        <div className="text-xl md:text-2xl font-oswald font-bold text-[#0161D5]">
+                            #{summary.overallRank ?? '-'}
                         </div>
+                        <p className="text-gray-600 text-sm">
+                            {summary.totalDistance.toFixed(1)} km total
+                        </p>
                     </div>
 
                     <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                        <div className="flex items-center">
-                            <div className="p-1.5 md:p-2 bg-green-100 rounded-lg">
-                                <span className="text-xl md:text-2xl">🏃‍♂️</span>
-                            </div>
-                            <div className="ml-3 md:ml-4">
-                                <h3 className="text-xs md:text-sm font-medium text-gray-500 whitespace-nowrap">
-                                    Running
-                                </h3>
-                                <p className="text-xl md:text-2xl font-oswald font-bold text-gray-900 whitespace-nowrap">
-                                    {runningDistance.toFixed(1)} KM
-                                </p>
-                            </div>
+                        <h3 className="text-sm font-medium text-gray-600 mb-1">🚴‍♂️ Cycling Rank</h3>
+                        <div className="text-xl md:text-2xl font-oswald font-bold text-[#0161D5]">
+                            #{summary.cyclingRank ?? '-'}
                         </div>
+                        <p className="text-gray-600 text-sm">
+                            {summary.cyclingDistance.toFixed(1)} km
+                        </p>
                     </div>
 
                     <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                        <div className="flex items-center">
-                            <div className="p-1.5 md:p-2 bg-blue-100 rounded-lg">
-                                <span className="text-xl md:text-2xl">🚴‍♂️</span>
-                            </div>
-                            <div className="ml-3 md:ml-4">
-                                <h3 className="text-xs md:text-sm font-medium text-gray-500 whitespace-nowrap">
-                                    Cycling
-                                </h3>
-                                <p className="text-xl md:text-2xl font-oswald font-bold text-gray-900 whitespace-nowrap">
-                                    {cyclingDistance.toFixed(1)} KM
-                                </p>
-                            </div>
+                        <h3 className="text-sm font-medium text-gray-600 mb-1">🏃‍♂️ Running Rank</h3>
+                        <div className="text-xl md:text-2xl font-oswald font-bold text-green-600">
+                            #{summary.runningRank ?? '-'}
                         </div>
+                        <p className="text-gray-600 text-sm">
+                            {summary.runningDistance.toFixed(1)} km
+                        </p>
                     </div>
 
                     <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                        <div className="flex items-center">
-                            <div className="p-1.5 md:p-2 bg-yellow-100 rounded-lg">
-                                <span className="text-xl md:text-2xl">🚶‍♂️</span>
-                            </div>
-                            <div className="ml-3 md:ml-4">
-                                <h3 className="text-xs md:text-sm font-medium text-gray-500 whitespace-nowrap">
-                                    Walking
-                                </h3>
-                                <p className="text-xl md:text-2xl font-oswald font-bold text-gray-900 whitespace-nowrap">
-                                    {walkingDistance.toFixed(1)} KM
-                                </p>
-                            </div>
+                        <h3 className="text-sm font-medium text-gray-600 mb-1">🚶‍♂️ Walking Rank</h3>
+                        <div className="text-xl md:text-2xl font-oswald font-bold text-yellow-600">
+                            #{summary.walkingRank ?? '-'}
                         </div>
+                        <p className="text-gray-600 text-sm">
+                            {summary.walkingDistance.toFixed(1)} km
+                        </p>
                     </div>
                 </div>
 
@@ -527,7 +576,7 @@ export default function MyTrainings() {
                                                 <div>
                                                     <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
                                                         <span
-                                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActivityColor(
+                                                            className={`inline-flex self-start w-fit items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActivityColor(
                                                                 activity.type,
                                                             )}`}
                                                         >
