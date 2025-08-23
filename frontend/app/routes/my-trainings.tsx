@@ -360,9 +360,30 @@ export default function MyTrainings() {
                         {eventStarted ? (
                             <button
                                 onClick={() => (showAddForm ? closeAddForm() : openAddForm())}
-                                className="font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                                className={
+                                    showAddForm
+                                        ? 'font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-md shadow-sm text-sm md:text-lg font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]'
+                                        : 'font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]'
+                                }
                             >
-                                <span className="mr-2">+</span>
+                                <span className="mr-2">
+                                    {showAddForm ? (
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="h-4 w-4"
+                                        >
+                                            <path d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    ) : (
+                                        '+'
+                                    )}
+                                </span>
                                 {showAddForm ? 'CANCEL' : 'ADD ACTIVITY'}
                             </button>
                         ) : (
