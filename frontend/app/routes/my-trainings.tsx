@@ -350,7 +350,7 @@ export default function MyTrainings() {
         <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex-1 flex flex-col min-h-0">
                 {/* Header */}
-                <div className="grid grid-cols-5 gap-3 items-end md:flex md:items-center md:justify-between mb-2 md:mb-2 flex-shrink-0">
+                <div className="gap-3 flex items-center justify-between mb-2 md:mb-2 flex-shrink-0">
                     <div className="col-span-3 h-full flex flex-col justify-center">
                         <h1 className="text-xl md:text-3xl font-oswald font-bold text-gray-900 leading-normal">
                             MY ACTIVITIES

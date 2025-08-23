@@ -202,7 +202,7 @@ export default function Standings() {
         <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex flex-col min-h-0">
                 {/* Header */}
-                <div className="grid grid-cols-5 gap-3 items-end md:flex md:items-center md:justify-between mb-2 md:mb-2">
+                <div className="gap-3 flex items-center justify-between mb-2 md:mb-2">
                     <div className="col-span-3 h-full flex flex-col justify-center">
                         <h1 className="text-xl md:text-3xl font-oswald font-bold text-gray-900 leading-normal">
                             COMMUNITY IMPACT
@@ -280,7 +280,7 @@ export default function Standings() {
 
                 {/* Leaderboard */}
                 <div className="bg-white rounded-lg shadow flex-1 flex flex-col min-h-0">
-                    <div className="px-6 py-4 border-b border-gray-200">
+                    <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
                         <nav className="flex flex-wrap gap-4">
                             {tabs.map((tab) => (
                                 <button
@@ -308,14 +308,14 @@ export default function Standings() {
                             <p className="text-gray-500">No activities added for the event yet.</p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-200 overflow-y-auto flex-1 min-h-0 scrollbar-custom">
+                        <div className="divide-y divide-gray-200 overflow-y-auto overflow-x-hidden flex-1 min-h-0 scrollbar-custom">
                             {displayUsers.map((user) => (
                                 <div
                                     key={user.id}
-                                    className={`px-6 py-4 hover:bg-gray-50 ${user.isCurrentUser ? 'bg-blue-50 border-l-4 border-blue-400' : ''}`}
+                                    className={`px-4 sm:px-6 py-4 hover:bg-gray-50 ${user.isCurrentUser ? 'bg-blue-50 border-l-4 border-blue-400' : ''}`}
                                 >
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
+                                        <div className="flex items-center space-x-4 min-w-0">
                                             <div className="flex-shrink-0 w-12 text-center">
                                                 <span className="text-2xl font-bold text-gray-900">
                                                     #{user.rank}
@@ -336,9 +336,9 @@ export default function Standings() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <div>
+                                            <div className="min-w-0 flex-1">
                                                 <div className="flex items-center space-x-2">
-                                                    <h4 className="text-base md:text-lg font-medium text-gray-900">
+                                                    <h4 className="text-base md:text-lg font-medium text-gray-900 truncate">
                                                         {user.name}
                                                         {user.isCurrentUser && (
                                                             <span className="ml-2 text-sm text-[#0161D5] font-medium">
@@ -347,7 +347,7 @@ export default function Standings() {
                                                         )}
                                                     </h4>
                                                 </div>
-                                                <p className="text-sm text-gray-500">
+                                                <p className="hidden sm:block text-sm text-gray-500 truncate">
                                                     {user.email}
                                                 </p>
                                                 <div className="flex items-center space-x-3 mt-1 text-xs md:text-sm text-gray-600">
