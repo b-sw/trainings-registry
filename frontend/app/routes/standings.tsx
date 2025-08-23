@@ -169,7 +169,7 @@ export default function Standings() {
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading standings...</p>
+                    <p className="mt-4 text-gray-600">Loading community impact...</p>
                 </div>
             </div>
         );
@@ -203,8 +203,8 @@ export default function Standings() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex flex-col min-h-0">
                 {/* Header */}
                 <div className="grid grid-cols-5 gap-3 items-end md:flex md:items-center md:justify-between mb-2 md:mb-2">
-                    <div className="col-span-3">
-                        <h1 className="text-2xl md:text-3xl font-oswald font-bold text-gray-900">
+                    <div className="col-span-3 h-full flex flex-col justify-center">
+                        <h1 className="text-xl md:text-3xl font-oswald font-bold text-gray-900 leading-normal">
                             COMMUNITY IMPACT
                         </h1>
                     </div>
