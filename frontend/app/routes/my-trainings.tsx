@@ -350,9 +350,9 @@ export default function MyTrainings() {
         <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex-1 flex flex-col min-h-0">
                 {/* Header */}
-                <div className="grid grid-cols-5 gap-3 items-end md:flex md:items-center md:justify-between mb-2 md:mb-2 flex-shrink-0">
-                    <div className="col-span-3">
-                        <h1 className="text-2xl md:text-3xl font-oswald font-bold text-gray-900">
+                <div className="gap-3 flex items-center justify-between mb-2 md:mb-2 flex-shrink-0">
+                    <div className="col-span-3 h-full flex flex-col justify-center">
+                        <h1 className="text-xl md:text-3xl font-oswald font-bold text-gray-900 leading-normal">
                             MY ACTIVITIES
                         </h1>
                     </div>
@@ -360,9 +360,30 @@ export default function MyTrainings() {
                         {eventStarted ? (
                             <button
                                 onClick={() => (showAddForm ? closeAddForm() : openAddForm())}
-                                className="font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"
+                                className={
+                                    showAddForm
+                                        ? 'font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 rounded-md shadow-sm text-sm md:text-lg font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]'
+                                        : 'font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]'
+                                }
                             >
-                                <span className="mr-2">+</span>
+                                <span className="mr-2">
+                                    {showAddForm ? (
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="h-4 w-4"
+                                        >
+                                            <path d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    ) : (
+                                        '+'
+                                    )}
+                                </span>
                                 {showAddForm ? 'CANCEL' : 'ADD ACTIVITY'}
                             </button>
                         ) : (
