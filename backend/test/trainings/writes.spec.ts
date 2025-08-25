@@ -186,6 +186,30 @@ describe('TrainingsController (writes)', () => {
             // then
             expect(response.status).toBe(400);
         });
+
+        it('returns 400 when date is in the future on create', async () => {
+            // given
+            const user = await bootstrap.utils.userUtils.createDefaultUser();
+            const token = bootstrap.utils.authUtils.generateToken(user);
+            const createTrainingDto = {
+                userId: user.id,
+                description: 'Future training',
+                // Mocked now is 2025-08-12T05:00:00.000Z; pick a future date
+                date: new Date('2025-08-13T00:00:00.000Z').toISOString(),
+                distance: 5.0,
+                activityType: ActivityType.Running,
+            };
+
+            // when
+            const response = await request(bootstrap.app.getHttpServer())
+                .post('/trainings')
+                .set('Authorization', `Bearer ${token}`)
+                .send(createTrainingDto);
+
+            // then
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe('Training date cannot be in the future');
+        });
     });
 
     describe('PUT /trainings/:trainingId', () => {

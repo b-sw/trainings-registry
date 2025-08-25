@@ -19,12 +19,18 @@ export class TrainingsWriteService {
     ) {}
 
     async create(dto: CreateTrainingDto): Promise<TrainingNormalized> {
-        // Disallow activity creation before 12 Aug 07:00 CET (05:00 UTC) in non-dev environments
+        // Time-gated activity creation in non-dev environments:
+        // - Not allowed before 12 Aug 07:00 CET (05:00 UTC)
+        // - Not allowed at/after 26 Aug 07:00 CET (05:00 UTC)
         if (!envConfig.isDevEnv) {
             const nowUtc = new Date();
             const creationOpenAtUtc = new Date('2025-08-12T05:00:00.000Z');
+            const creationCloseAtUtc = new Date('2025-08-26T05:00:00.000Z');
             if (nowUtc.getTime() < creationOpenAtUtc.getTime()) {
                 throw new BadRequestException('Activity creation is not allowed yet');
+            }
+            if (nowUtc.getTime() >= creationCloseAtUtc.getTime()) {
+                throw new BadRequestException('Activity creation is no longer allowed');
             }
         }
 
