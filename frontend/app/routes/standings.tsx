@@ -4,7 +4,7 @@ import { Tooltip } from '../components/Tooltip';
 import type { UserSerialized } from '../utils/api';
 import { trainingApi, userApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
-import { EVENT_START_DATE_MONTH, hasEventStartedCET } from '../utils/event';
+import { EVENT_START_DATE_MONTH, hasEventEndedCET, hasEventStartedCET } from '../utils/event';
 
 interface User {
     rank: number;
@@ -29,6 +29,7 @@ export default function Standings() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const eventStarted = hasEventStartedCET() || config.IS_DEV_ENV;
+    const eventEnded = hasEventEndedCET();
     const [teamTotals, setTeamTotals] = useState<{
         total: number;
         cycling: number;
@@ -209,7 +210,18 @@ export default function Standings() {
                         </h1>
                     </div>
                     <div className="col-span-2 flex justify-end">
-                        {eventStarted ? (
+                        {eventEnded ? (
+                            <Tooltip label="The event has ended!">
+                                <button
+                                    onClick={() => undefined}
+                                    disabled
+                                    className="font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white opacity-50 cursor-not-allowed"
+                                >
+                                    <span className="mr-2">+</span>
+                                    ADD ACTIVITY
+                                </button>
+                            </Tooltip>
+                        ) : eventStarted ? (
                             <button
                                 onClick={() => (window.location.href = '/my-activities?add=true')}
                                 className="font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white hover:bg-[#0152b5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0161D5]"

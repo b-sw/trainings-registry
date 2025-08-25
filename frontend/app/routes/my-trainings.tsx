@@ -7,7 +7,9 @@ import { Tooltip } from '../components/Tooltip';
 import type { Activity } from '../utils/api';
 import { mapTrainingToActivity, trainingApi } from '../utils/api';
 import { useAuth } from '../utils/auth';
-import { EVENT_START_DATE_MONTH, hasEventStartedCET } from '../utils/event';
+import { EVENT_START_DATE_MONTH, hasEventEndedCET, hasEventStartedCET } from '../utils/event';
+
+const eventEnded = hasEventEndedCET();
 
 export default function MyTrainings() {
     const { user } = useAuth();
@@ -16,7 +18,9 @@ export default function MyTrainings() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [showAddForm, setShowAddForm] = useState(() => searchParams.get('add') === 'true');
+    const [showAddForm, setShowAddForm] = useState(
+        () => searchParams.get('add') === 'true' && !eventEnded,
+    );
     const [hasMore, setHasMore] = useState(true);
     const [skip, setSkip] = useState(0);
     const limit = 20;
@@ -357,7 +361,35 @@ export default function MyTrainings() {
                         </h1>
                     </div>
                     <div className="col-span-2 flex justify-end">
-                        {eventStarted ? (
+                        {eventEnded ? (
+                            <Tooltip label="The event has ended!">
+                                <button
+                                    onClick={() => undefined}
+                                    disabled
+                                    className="font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white opacity-50 cursor-not-allowed"
+                                >
+                                    <span className="mr-2">
+                                        {showAddForm ? (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                className="h-4 w-4"
+                                            >
+                                                <path d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        ) : (
+                                            '+'
+                                        )}
+                                    </span>
+                                    {showAddForm ? 'CANCEL' : 'ADD ACTIVITY'}
+                                </button>
+                            </Tooltip>
+                        ) : eventStarted ? (
                             <button
                                 onClick={() => (showAddForm ? closeAddForm() : openAddForm())}
                                 className={
@@ -393,8 +425,25 @@ export default function MyTrainings() {
                                     disabled
                                     className="font-oswald inline-flex items-center justify-center w-full md:w-auto px-3 py-1.5 md:px-4 md:py-2 bg-[#0161D5] border border-transparent rounded-md shadow-sm text-sm md:text-lg font-medium text-white opacity-50 cursor-not-allowed"
                                 >
-                                    <span className="mr-2">+</span>
-                                    ADD ACTIVITY
+                                    <span className="mr-2">
+                                        {showAddForm ? (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                className="h-4 w-4"
+                                            >
+                                                <path d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        ) : (
+                                            '+'
+                                        )}
+                                    </span>
+                                    {showAddForm ? 'CANCEL' : 'ADD ACTIVITY'}
                                 </button>
                             </Tooltip>
                         )}
@@ -563,7 +612,17 @@ export default function MyTrainings() {
                             <p className="hidden sm:block text-gray-500 mb-4">
                                 Start tracking your fitness journey by adding your first activity.
                             </p>
-                            {eventStarted ? (
+                            {eventEnded ? (
+                                <Tooltip label="The event has ended!">
+                                    <button
+                                        onClick={() => undefined}
+                                        disabled
+                                        className="font-oswald inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-lg font-medium text-white opacity-50 cursor-not-allowed"
+                                    >
+                                        + ADD YOUR FIRST ACTIVITY
+                                    </button>
+                                </Tooltip>
+                            ) : eventStarted ? (
                                 <button
                                     onClick={openAddForm}
                                     className="font-oswald inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-lg font-medium text-white hover:bg-blue-700"

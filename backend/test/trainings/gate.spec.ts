@@ -7,6 +7,7 @@ import { createTestApp } from '../utils/bootstrap';
 /**
  * Verifies that in non-dev environments, activity creation is blocked
  * before 12 Aug 07:00 CET (05:00 UTC) and allowed afterwards.
+ * Also verifies that creation is blocked at/after 26 Aug 07:00 CET (05:00 UTC).
  */
 describe('TrainingsController (time gate, non-dev)', () => {
     const originalIsDev = envConfig.isDevEnv;
@@ -64,6 +65,32 @@ describe('TrainingsController (time gate, non-dev)', () => {
             .send(createTrainingDto);
 
         expect(response.status).toBe(201);
+
+        await bootstrap.methods.afterAll();
+    });
+
+    it('returns 400 when now is after closing time', async () => {
+        envConfig.isDevEnv = false;
+        MockDate.set('2025-08-26T05:00:01.000Z');
+        const bootstrap = await createTestApp();
+
+        const user = await bootstrap.utils.userUtils.createDefaultUser();
+        const token = bootstrap.utils.authUtils.generateToken(user);
+        const createTrainingDto = {
+            userId: user.id,
+            description: 'Late registration',
+            date: new Date('2025-08-20T10:00:00.000Z').toISOString(),
+            distance: 2.0,
+            activityType: ActivityType.Running,
+        };
+
+        const response = await request(bootstrap.app.getHttpServer())
+            .post('/trainings')
+            .set('Authorization', `Bearer ${token}`)
+            .send(createTrainingDto);
+
+        expect(response.status).toBe(400);
+        expect(response.body.message).toBe('Activity creation is no longer allowed');
 
         await bootstrap.methods.afterAll();
     });
