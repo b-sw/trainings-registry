@@ -1,9 +1,9 @@
 name: Mongo backup (prod)
 
-on:
-  schedule:
-    - cron: '*/15 * * * *' # Every 15 minutes
-  workflow_dispatch:
+# on:
+#   schedule:
+#     - cron: '*/15 * * * *' # Every 15 minutes
+#   workflow_dispatch:
 
 jobs:
   backup:
